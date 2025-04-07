@@ -1,13 +1,5 @@
-import { useImageSize } from './useImageSize';
-import { useInputRef } from './useInputRef';
-import { useKeyboardListeners } from './useKeyboardListeners';
-import { useScrollableItems } from './useScrollableItems';
-import { useTimer } from './useTimer';
-
-export const hooks = {
-  useImageSize,
-  useInputRef,
-  useKeyboardListeners,
-  useScrollableItems,
-  useTimer,
-};
+export { useImageSize } from './useImageSize';
+export { useInputRef } from './useInputRef';
+export { useKeyboardListeners } from './useKeyboardListeners';
+export { useScrollableItems } from './useScrollableItems';
+export { useTimer } from './useTimer';

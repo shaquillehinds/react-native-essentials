@@ -1,5 +1,3 @@
-import { Layout } from './Layout';
-import { RowLayout } from './Row.layout';
-import { ScreenLayout } from './Screen.layout';
-
-export const layouts = { Layout, RowLayout, ScreenLayout };
+export { Layout } from './Layout';
+export { RowLayout } from './Row.layout';
+export { ScreenLayout } from './Screen.layout';

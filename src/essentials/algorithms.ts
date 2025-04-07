@@ -77,11 +77,11 @@ export function camelToUpperSnake(str: string) {
     .toUpperCase();
 }
 
-interface CentsToDollarsProps {
+type CentsToDollarsProps = {
   cents: number;
   dollarSign?: boolean;
   currency?: string;
-}
+};
 
 export function centsToDollars({
   cents,
