@@ -1,4 +1,7 @@
 /* eslint-disable no-extend-native */
+
+import type { FilterMapFunc, GlobalIs } from '../@types/global';
+
 globalThis.is = function <T>(value: T) {
   return value ? value : undefined;
 } as GlobalIs;
