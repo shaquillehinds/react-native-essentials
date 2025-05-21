@@ -13,6 +13,12 @@ export const relativeY = (num: number) =>
   (SCREEN_HEIGHT - diff / 2) * (num / 100);
 export const relativeX = (num: number) => SCREEN_WIDTH * (num / 100);
 
+export const relativeShort = (num: number) =>
+  Math.min(SCREEN_WIDTH, SCREEN_HEIGHT) * (num / 100);
+
+export const relativeLong = (num: number) =>
+  Math.max(SCREEN_WIDTH, SCREEN_HEIGHT) * (num / 100);
+
 export function normalize(size: number) {
   const newSize = relativeY(size * scale);
   if (Platform.OS === 'ios') {
