@@ -180,5 +180,8 @@
     "languages": "js",
     "type": "library",
     "version": "0.48.5"
+  },
+  "dependencies": {
+    "eventemitter3": "^5.0.1"
   }
 }
