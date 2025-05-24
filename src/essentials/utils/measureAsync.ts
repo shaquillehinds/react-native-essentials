@@ -1,7 +1,7 @@
 import type { RefObject } from 'react';
-import {
-  type TextInput,
-  type NativeSyntheticEvent,
+import type {
+  TextInput,
+  NativeSyntheticEvent,
   View,
   Image,
 } from 'react-native';

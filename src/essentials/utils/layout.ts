@@ -27,3 +27,21 @@ export function normalize(size: number) {
     return Math.round(PixelRatio.roundToNearestPixel(newSize));
   }
 }
+
+export const relativeYWorklet = (num: number) => {
+  'worklet';
+  return (SCREEN_HEIGHT - diff / 2) * (num / 100);
+};
+export const relativeXWorklet = (num: number) => {
+  'worklet';
+  return SCREEN_WIDTH * (num / 100);
+};
+export const relativeShortWorklet = (num: number) => {
+  'worklet';
+  Math.min(SCREEN_WIDTH, SCREEN_HEIGHT) * (num / 100);
+};
+
+export const relativeLongWorklet = (num: number) => {
+  'worklet';
+  Math.max(SCREEN_WIDTH, SCREEN_HEIGHT) * (num / 100);
+};
