@@ -31,11 +31,8 @@ export const useDeviceOrientation = () => {
 
   useEffect(() => {
     const updateDimensions = (dimensions: ScaledSizeDimensions) => {
-      const {
-        screen: { width, height },
-        window,
-      } = dimensions;
-      const diff = window.height - height;
+      //prettier-ignore
+      const { screen: { width, height }} = dimensions;
       setOrientation({
         orientation: width > height ? 'landscape' : 'portrait',
         screenHeight: height,
@@ -43,7 +40,7 @@ export const useDeviceOrientation = () => {
         relativeLong: (num: number) => Math.max(width, height) * (num / 100),
         relativeShort: (num: number) => Math.min(width, height) * (num / 100),
         relativeX: (num: number) => width * (num / 100),
-        relativeY: (num: number) => (height - diff / 2) * (num / 100),
+        relativeY: (num: number) => height * (num / 100),
       });
     };
     const subscription = Dimensions.addEventListener(
@@ -54,5 +51,13 @@ export const useDeviceOrientation = () => {
     return () => subscription.remove();
   }, []);
 
-  return orientation;
+  return {
+    ...orientation,
+    relativeLong: (num: number) =>
+      Math.max(orientation.screenWidth, orientation.screenHeight) * (num / 100),
+    relativeShort: (num: number) =>
+      Math.min(orientation.screenWidth, orientation.screenHeight) * (num / 100),
+    relativeX: (num: number) => orientation.screenWidth * (num / 100),
+    relativeY: (num: number) => orientation.screenHeight * (num / 100),
+  };
 };
