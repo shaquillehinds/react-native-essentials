@@ -38,11 +38,33 @@ export const useDeviceOrientation = () => {
 
   return {
     ...orientation,
-    relativeLong: (num: number) =>
-      Math.max(orientation.screenWidth, orientation.screenHeight) * (num / 100),
+    relativeX: (num: number) => orientation.screenWidth * (num / 100),
+    relativeXWorklet: (num: number) => {
+      'worklet';
+      return orientation.screenWidth * (num / 100);
+    },
+    relativeY: (num: number) => orientation.screenHeight * (num / 100),
+    relativeYWorklet: (num: number) => {
+      'worklet';
+      return orientation.screenHeight * (num / 100);
+    },
     relativeShort: (num: number) =>
       Math.min(orientation.screenWidth, orientation.screenHeight) * (num / 100),
-    relativeX: (num: number) => orientation.screenWidth * (num / 100),
-    relativeY: (num: number) => orientation.screenHeight * (num / 100),
+    relativeShortWorklet: (num: number) => {
+      'worklet';
+      return (
+        Math.min(orientation.screenWidth, orientation.screenHeight) *
+        (num / 100)
+      );
+    },
+    relativeLong: (num: number) =>
+      Math.max(orientation.screenWidth, orientation.screenHeight) * (num / 100),
+    relativeLongWorklet: (num: number) => {
+      'worklet';
+      return (
+        Math.max(orientation.screenWidth, orientation.screenHeight) *
+        (num / 100)
+      );
+    },
   };
 };
