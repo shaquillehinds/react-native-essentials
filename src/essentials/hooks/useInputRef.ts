@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import type { TextInput } from 'react-native';
 
-type UseInputRefProps = {
+export type UseInputRefProps = {
   inputValidationFunction?: (text: string) => boolean;
 };
 

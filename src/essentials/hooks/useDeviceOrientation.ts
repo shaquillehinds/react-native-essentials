@@ -5,7 +5,7 @@ import {
   type ScaledSizeDimensions,
 } from '../constants/device.const';
 
-export type DeviceOrientation = {
+type DeviceOrientation = {
   screenWidth: number;
   screenHeight: number;
   orientation: Orientation;

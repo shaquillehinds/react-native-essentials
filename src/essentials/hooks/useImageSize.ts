@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Image } from 'react-native';
 
-interface UseImageSizeProps {
+export interface UseImageSizeProps {
   image?: string;
   maxWidth: number;
   maxHeight: number;
@@ -32,11 +32,11 @@ export function useImageSize(props?: UseImageSizeProps) {
   return { imageSize, calculateSize };
 }
 
-interface UseImageSizesProps extends Omit<UseImageSizeProps, 'image'> {
+export interface UseImageSizesProps extends Omit<UseImageSizeProps, 'image'> {
   images: string[];
 }
 
-interface ImageSize {
+export interface ImageSize {
   width: number;
   height: number;
 }
@@ -83,7 +83,7 @@ export function useImageSizes(props: UseImageSizesProps) {
   return { imageSizes, calculateSize };
 }
 
-function calculateSize({
+export function calculateSize({
   imageWidth,
   imageHeight,
   maxWidth,

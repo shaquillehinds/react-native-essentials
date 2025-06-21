@@ -1,7 +1,7 @@
 import { Schedule } from '../utils/Scheduler';
 import { useEffect, useState } from 'react';
 
-interface UseTimerProps {
+export interface UseTimerProps {
   seconds: number;
   onTimerEnds: () => void;
   start: boolean;

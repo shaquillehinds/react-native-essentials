@@ -1,7 +1,7 @@
 import { useState } from 'react';
 // import { AxiosResponse } from 'axios';
 
-interface ItemsFetchingFunctionProps {
+export interface ItemsFetchingFunctionProps {
   limit: number;
   skip: number;
 }

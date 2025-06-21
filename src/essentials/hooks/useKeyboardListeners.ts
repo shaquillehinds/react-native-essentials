@@ -7,7 +7,7 @@ import {
   type KeyboardEventName,
 } from 'react-native';
 
-type UseKeyboardListenersProps = {
+export type UseKeyboardListenersProps = {
   listeners: Partial<Record<KeyboardEventName, KeyboardEventListener>>;
   keyboardHeightRef?: MutableRefObject<number>;
   subscribeCondition?: () => boolean;

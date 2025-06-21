@@ -2,7 +2,7 @@ import { type PropsWithChildren } from 'react';
 import { View, SafeAreaView, type ViewStyle } from 'react-native';
 import type { LayoutProps } from './Layout';
 
-type ScreenLayoutProps = {
+export type ScreenLayoutProps = {
   safe?: boolean;
 } & LayoutProps;
 
