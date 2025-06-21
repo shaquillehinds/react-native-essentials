@@ -50,7 +50,7 @@ export function BaseText({
     <TextComponent
       onPress={onPress}
       numberOfLines={numberOfLines}
-      style={[animatedStyle, style, styles]}
+      style={[styles, animatedStyle, style]}
       {...rest}
     >
       {children}
