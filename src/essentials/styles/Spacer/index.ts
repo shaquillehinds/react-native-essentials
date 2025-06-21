@@ -1,3 +1,6 @@
-import { spacerStyles } from './Spacer.style';
-
-export { spacerStyles };
+export {
+  spacerStyles,
+  type SpaceType,
+  type Spacer,
+  transformSpacing,
+} from './Spacer.style';

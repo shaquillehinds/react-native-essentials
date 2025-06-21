@@ -1,2 +1,7 @@
-export { shadowStyles } from './Shadow.style';
-export { spacerStyles } from './Spacer';
+export { shadowStyles, type ShadowStylesProps } from './Shadow.style';
+export {
+  spacerStyles,
+  type SpaceType,
+  type Spacer,
+  transformSpacing,
+} from './Spacer';

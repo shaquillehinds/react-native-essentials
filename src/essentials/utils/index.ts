@@ -1,5 +1,5 @@
-export { filterMap } from './filterMap';
-export { measureAsync } from './measureAsync';
+export { filterMap, type FilterMapFunc } from './filterMap';
+export { measureAsync, type MeasureInputAsyncResponse } from './measureAsync';
 export { getSequantialRandomId } from './randomSequentialId';
 export * as Scheduler from './Scheduler';
 export { wait } from './wait';

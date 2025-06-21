@@ -1,4 +1,4 @@
-interface ShadowStylesProps {
+export interface ShadowStylesProps {
   shadowOffset?: { width: number; height: number };
   shadowColor?: string;
   shadowOpacity?: number;

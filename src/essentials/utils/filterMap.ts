@@ -1,4 +1,4 @@
-type FilterMapFunc<T, E> = (arr: T, index: number) => E;
+export type FilterMapFunc<T, E> = (arr: T, index: number) => E;
 
 export function filterMap<T, E>(arr: T[], func: FilterMapFunc<T, E>) {
   const mapped: ReturnType<FilterMapFunc<T, E>>[] = [];
