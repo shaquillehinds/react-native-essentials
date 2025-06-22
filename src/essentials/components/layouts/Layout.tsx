@@ -12,8 +12,8 @@ import {
 import type { Spacing } from '../../styles/Spacer/Spacer.types';
 import { transformSpacing } from '../../styles/Spacer/Spacer.style';
 import { relativeX, relativeY } from '../../utils/layout';
-export type LayoutProps<Scrollable extends boolean = false> = {
-  scrollable?: Scrollable extends undefined ? false : true;
+export type LayoutProps<Scrollable extends boolean | undefined = undefined> = {
+  scrollable?: Scrollable;
   wrap?: boolean;
   /**
    * This number will be used as a percentage of the screen width, where 100 is 100% screen width
@@ -34,42 +34,56 @@ export type LayoutProps<Scrollable extends boolean = false> = {
 } & Spacing &
   (Scrollable extends true ? ScrollViewProps : ViewProps);
 
-export function Layout<Scrollable extends boolean = false>(
-  props: PropsWithChildren<LayoutProps<Scrollable>>
-) {
+export function Layout<Scrollable extends boolean | undefined = undefined>({
+  center,
+  centerX,
+  wrap,
+  height,
+  width,
+  scrollable,
+  margin,
+  alignSelf,
+  padding,
+  flexDirection,
+  backgroundColor,
+  spaceBetween,
+  spaceEven,
+  children,
+  ...props
+}: PropsWithChildren<LayoutProps<Scrollable>>) {
   const style: ViewStyle = {
-    ...transformSpacing({ margin: props.margin }),
-    width: props.width ? relativeX(props.width) : undefined,
-    height: props.height ? relativeY(props.height) : undefined,
-    alignSelf: props.alignSelf,
+    ...transformSpacing({ margin: margin }),
+    width: width ? relativeX(width) : undefined,
+    height: height ? relativeY(height) : undefined,
+    alignSelf: alignSelf,
   };
   const contentStyle: ViewStyle = {
-    ...transformSpacing({ padding: props.padding }),
-    alignItems: props.center ? 'center' : undefined,
-    flexDirection: props.flexDirection,
-    backgroundColor: props.backgroundColor,
-    flexWrap: props.wrap ? 'wrap' : 'nowrap',
-    justifyContent: props.spaceEven
+    ...transformSpacing({ padding: padding }),
+    alignItems: center ? 'center' : undefined,
+    flexDirection: flexDirection,
+    backgroundColor: backgroundColor,
+    flexWrap: wrap ? 'wrap' : 'nowrap',
+    justifyContent: spaceEven
       ? 'space-evenly'
-      : props.spaceBetween
+      : spaceBetween
         ? 'space-between'
-        : props.centerX
+        : centerX
           ? 'center'
           : undefined,
   };
-  if (props.scrollable)
+  if (scrollable)
     return (
       <ScrollView
         {...props}
         style={[style, props.style]}
         contentContainerStyle={contentStyle}
       >
-        {props.children}
+        {children}
       </ScrollView>
     );
   return (
     <View {...props} style={[style, contentStyle, props.style]}>
-      {props.children}
+      {children}
     </View>
   );
 }
