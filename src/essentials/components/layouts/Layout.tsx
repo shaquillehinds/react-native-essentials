@@ -1,17 +1,19 @@
 import type { PropsWithChildren } from 'react';
 import {
   View,
+  ScrollView,
   type StyleProp,
   type ViewProps,
   type ViewStyle,
   type FlexAlignType,
   type FlexStyle,
+  type ScrollViewProps,
 } from 'react-native';
 import type { Spacing } from '../../styles/Spacer/Spacer.types';
 import { transformSpacing } from '../../styles/Spacer/Spacer.style';
 import { relativeX, relativeY } from '../../utils/layout';
-
-export type LayoutProps = {
+export type LayoutProps<Scrollable extends boolean = false> = {
+  scrollable?: Scrollable;
   wrap?: boolean;
   /**
    * This number will be used as a percentage of the screen width, where 100 is 100% screen width
@@ -30,12 +32,23 @@ export type LayoutProps = {
   flexDirection?: FlexStyle['flexDirection'];
   backgroundColor?: string;
 } & Spacing &
-  ViewProps;
+  (Scrollable extends true ? ScrollViewProps : ViewProps);
 
-export function Layout(props: PropsWithChildren<LayoutProps>) {
+export function Layout<Scrollable extends boolean = false>(
+  props: PropsWithChildren<LayoutProps<Scrollable>>
+) {
   const style: ViewStyle = {
+    ...transformSpacing({ margin: props.margin }),
+    width: props.width ? relativeX(props.width) : undefined,
+    height: props.height ? relativeY(props.height) : undefined,
+    alignSelf: props.alignSelf,
+  };
+  const contentStyle: ViewStyle = {
+    ...transformSpacing({ padding: props.padding }),
     alignItems: props.center ? 'center' : undefined,
-    ...transformSpacing({ margin: props.margin, padding: props.padding }),
+    flexDirection: props.flexDirection,
+    backgroundColor: props.backgroundColor,
+    flexWrap: props.wrap ? 'wrap' : 'nowrap',
     justifyContent: props.spaceEven
       ? 'space-evenly'
       : props.spaceBetween
@@ -43,15 +56,19 @@ export function Layout(props: PropsWithChildren<LayoutProps>) {
         : props.centerX
           ? 'center'
           : undefined,
-    width: props.width ? relativeX(props.width) : undefined,
-    height: props.height ? relativeY(props.height) : undefined,
-    flexDirection: props.flexDirection,
-    backgroundColor: props.backgroundColor,
-    flexWrap: props.wrap ? 'wrap' : 'nowrap',
-    alignSelf: props.alignSelf,
   };
+  if (props.scrollable)
+    return (
+      <ScrollView
+        {...props}
+        style={[style, props.style]}
+        contentContainerStyle={contentStyle}
+      >
+        {props.children}
+      </ScrollView>
+    );
   return (
-    <View {...props} style={[style, props.style]}>
+    <View {...props} style={[style, contentStyle, props.style]}>
       {props.children}
     </View>
   );
