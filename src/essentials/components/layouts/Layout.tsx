@@ -49,16 +49,19 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
   spaceBetween,
   spaceEven,
   children,
+  style,
   ...props
 }: PropsWithChildren<LayoutProps<Scrollable>>) {
-  const style: ViewStyle = {
+  const viewStyle: ViewStyle = {
     ...transformSpacing({ margin: margin }),
     width: width ? relativeX(width) : undefined,
     height: height ? relativeY(height) : undefined,
     alignSelf: alignSelf,
+    overflow: scrollable ? 'visible' : 'hidden',
   };
   const contentStyle: ViewStyle = {
     ...transformSpacing({ padding: padding }),
+    overflow: scrollable ? 'visible' : 'hidden',
     alignItems: center ? 'center' : undefined,
     flexDirection: flexDirection,
     backgroundColor: backgroundColor,
@@ -71,18 +74,23 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
           ? 'center'
           : undefined,
   };
-  if (scrollable)
+  if (scrollable) {
+    let contentContainerStyle: undefined | ViewStyle;
+    if ('contentContainerStyle' in props) {
+      contentContainerStyle = props.contentContainerStyle as ViewStyle;
+    }
     return (
       <ScrollView
         {...props}
-        style={[style, props.style]}
-        contentContainerStyle={contentStyle}
+        style={[viewStyle, style]}
+        contentContainerStyle={[contentStyle, contentContainerStyle]}
       >
         {children}
       </ScrollView>
     );
+  }
   return (
-    <View {...props} style={[style, contentStyle, props.style]}>
+    <View {...props} style={[contentStyle, viewStyle, style]}>
       {children}
     </View>
   );
