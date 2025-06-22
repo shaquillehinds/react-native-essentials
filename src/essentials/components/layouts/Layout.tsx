@@ -13,7 +13,7 @@ import type { Spacing } from '../../styles/Spacer/Spacer.types';
 import { transformSpacing } from '../../styles/Spacer/Spacer.style';
 import { relativeX, relativeY } from '../../utils/layout';
 export type LayoutProps<Scrollable extends boolean = false> = {
-  scrollable?: Scrollable;
+  scrollable?: Scrollable extends undefined ? false : true;
   wrap?: boolean;
   /**
    * This number will be used as a percentage of the screen width, where 100 is 100% screen width
