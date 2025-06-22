@@ -2,7 +2,7 @@ import { Text, type TextStyle } from 'react-native';
 import { transformSpacing } from '../../styles';
 import type { BaseTextProps, LetterSpacing, LineHeight } from './Text.types';
 import type { PropsWithChildren } from 'react';
-import { fontSizes } from './sizeCalculations';
+import { fontSizes } from '../../utils/sizeCalculations';
 import Animated from 'react-native-reanimated';
 
 const spacings: { [key in LetterSpacing]: number } = {

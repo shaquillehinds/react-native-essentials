@@ -4,3 +4,4 @@ export { getSequantialRandomId } from './randomSequentialId';
 export * as Scheduler from './Scheduler';
 export { wait } from './wait';
 export * from './layout';
+export * from './sizeCalculations';
