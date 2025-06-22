@@ -8,10 +8,9 @@ export type ScreenLayoutProps<
   safe?: boolean;
 } & LayoutProps<Scrollable>;
 
-export function ScreenLayout<Scrollable extends boolean | undefined>({
-  scrollable,
-  ...props
-}: PropsWithChildren<ScreenLayoutProps<Scrollable>>) {
+export function ScreenLayout<
+  Scrollable extends boolean | undefined = undefined,
+>({ scrollable, ...props }: PropsWithChildren<ScreenLayoutProps<Scrollable>>) {
   const style: ViewStyle = {
     display: 'flex',
     flex: 1,
