@@ -57,11 +57,9 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
     width: width ? relativeX(width) : undefined,
     height: height ? relativeY(height) : undefined,
     alignSelf: alignSelf,
-    overflow: scrollable ? 'visible' : 'hidden',
   };
   const contentStyle: ViewStyle = {
     ...transformSpacing({ padding: padding }),
-    overflow: scrollable ? 'visible' : 'hidden',
     alignItems: center ? 'center' : undefined,
     flexDirection: flexDirection,
     backgroundColor: backgroundColor,
@@ -75,6 +73,7 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
           : undefined,
   };
   if (scrollable) {
+    viewStyle.overflow = 'visible';
     let contentContainerStyle: undefined | ViewStyle;
     if ('contentContainerStyle' in props) {
       contentContainerStyle = props.contentContainerStyle as ViewStyle;
