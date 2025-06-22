@@ -1,6 +1,7 @@
 import { type PropsWithChildren } from 'react';
-import { SafeAreaView, type ColorValue, type ViewStyle } from 'react-native';
+import { type ColorValue, type ViewStyle } from 'react-native';
 import { Layout, type LayoutProps } from './Layout';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 export type ScreenLayoutProps<
   Scrollable extends boolean | undefined = undefined,
@@ -31,11 +32,17 @@ export function ScreenLayout<
       backgroundColor,
     };
     return (
-      <SafeAreaView style={safeStyle}>
-        <Layout {...props} style={[style, props.style]} scrollable={scrollable}>
-          {props.children}
-        </Layout>
-      </SafeAreaView>
+      <SafeAreaProvider>
+        <SafeAreaView style={safeStyle} edges={['top', 'bottom']}>
+          <Layout
+            {...props}
+            style={[style, props.style]}
+            scrollable={scrollable}
+          >
+            {props.children}
+          </Layout>
+        </SafeAreaView>
+      </SafeAreaProvider>
     );
   }
   return (
