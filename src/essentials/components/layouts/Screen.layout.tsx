@@ -1,6 +1,6 @@
 import { type PropsWithChildren } from 'react';
-import { View, SafeAreaView, type ViewStyle } from 'react-native';
-import type { LayoutProps } from './Layout';
+import { SafeAreaView, type ViewStyle } from 'react-native';
+import { Layout, type LayoutProps } from './Layout';
 
 export type ScreenLayoutProps = {
   safe?: boolean;
@@ -12,9 +12,9 @@ export function ScreenLayout(props: PropsWithChildren<ScreenLayoutProps>) {
     flex: 1,
   };
   return (
-    <View {...props} style={[style, props.style]}>
+    <Layout {...props} style={[style, props.style]}>
       {props?.safe && <SafeAreaView />}
       {props.children}
-    </View>
+    </Layout>
   );
 }
