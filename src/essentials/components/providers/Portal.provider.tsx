@@ -1,7 +1,9 @@
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ReactNode,
@@ -39,59 +41,70 @@ export const PortalProvider = ({
   /**
    * Determines how much time in millieseconds to wait before removing portal item.
    * Useful for stopping premature portal item ejection due to content changes
-   * @default 500 milliseconds
+   * @default 100 milliseconds
    */
   unMountBufferTimeMS?: number;
   /**
-   * How much time to wait until portal update can be called again.
-   * Useful for stopping infinite portal update feedback loops.
-   * updateBufferTimeMS * portals.length
-   * @default 15 milliseconds
+   * How much time to wait until portal update can be called again. Usually won't be necessary since update shouldn't cause rerenders but useful for stopping infinite portal update feedback loops if they do occur.
    */
   updateBufferTimeMS?: number;
 }) => {
-  const [portals, setPortals] = useState<PortalItem[]>([]);
+  const portalItemsAmount = useRef(0);
   const keys = useRef<Record<string, PortalItemStatusTime>>({});
 
-  const unMountBuffer = unMountBufferTimeMS || 100;
-  const updateBuffer = (updateBufferTimeMS || 15) * portals.length;
+  const [portals, setPortals] = useState<PortalItem[]>([]);
 
-  const mount: PortalContextValue['mount'] = (key, element, onMount) => {
-    if (keys.current[key]) return key;
-    setPortals((prev) => [...prev, { key, element }]);
-    keys.current[key] = { mount: Date.now() };
-    onMount?.(key);
-    return key;
-  };
+  if (portals.length) portalItemsAmount.current = portals.length;
 
-  const update = (key: PortalKey, element: ReactNode) => {
+  const mount: PortalContextValue['mount'] = useCallback(
+    (key, element, onMount) => {
+      if (keys.current[key]) return key;
+      setPortals((prev) => [...prev, { key, element }]);
+      keys.current[key] = { mount: Date.now() };
+      onMount?.(key);
+      return key;
+    },
+    []
+  );
+
+  const update: PortalContextValue['update'] = useCallback((key, element) => {
     if (!keys.current[key]) return;
     if (
+      updateBufferTimeMS &&
       keys.current[key].update &&
-      Date.now() - keys.current[key].update <= updateBuffer
+      portalItemsAmount.current
     )
-      return;
+      if (
+        Date.now() - keys.current[key].update <=
+        updateBufferTimeMS * portalItemsAmount.current
+      )
+        return;
     setPortals((prev) =>
       prev.map((item) => (item.key === key ? { ...item, element } : item))
     );
     keys.current[key].update = Date.now();
-  };
+  }, []);
 
-  const unmount: PortalContextValue['unmount'] = (key, onUnMount) => {
-    if (!keys.current[key]) return;
-    keys.current[key].unmount = Date.now();
-    setTimeout(() => {
-      const updateTime = keys.current[key]?.update || 0;
-      const unmountTime = keys.current[key]?.unmount || 0;
-      if (updateTime > unmountTime) return;
-      setPortals((prev) => prev.filter((item) => item.key !== key));
-      delete keys.current[key];
-      onUnMount?.(key);
-    }, unMountBuffer);
-  };
+  const unmount: PortalContextValue['unmount'] = useCallback(
+    (key, onUnMount) => {
+      if (!keys.current[key]) return;
+      keys.current[key].unmount = Date.now();
+      setTimeout(() => {
+        const updateTime = keys.current[key]?.update || 0;
+        const unmountTime = keys.current[key]?.unmount || 0;
+        if (updateTime > unmountTime) return;
+        setPortals((prev) => prev.filter((item) => item.key !== key));
+        delete keys.current[key];
+        onUnMount?.(key);
+      }, unMountBufferTimeMS || 100);
+    },
+    []
+  );
+
+  const value = useMemo(() => ({ mount, update, unmount }), []);
 
   return (
-    <PortalContext.Provider value={{ mount, update, unmount }}>
+    <PortalContext.Provider value={value}>
       {children}
       <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
         {portals.map(({ key, element }) => (
