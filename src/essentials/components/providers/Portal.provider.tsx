@@ -1,11 +1,13 @@
 import React, {
   createContext,
   useContext,
+  useEffect,
   useRef,
   useState,
   type ReactNode,
 } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { getSequantialRandomId } from '../../utils';
 
 export type PortalKey = number | string;
 export type PortalItem = { key: PortalKey; element: ReactNode };
@@ -106,4 +108,27 @@ export const usePortal = () => {
     return null;
   }
   return context;
+};
+
+export type UsePortalComponentProps = {
+  name: string;
+  Component: ReactNode;
+};
+export const usePortalComponent = (props: UsePortalComponentProps) => {
+  const portalId = useRef('');
+  const portal = usePortal();
+  useEffect(() => {
+    if (portalId.current) {
+      portal?.update(portalId.current, props.Component);
+    } else {
+      portalId.current = getSequantialRandomId(props.name);
+      portal?.mount(portalId.current, props.Component);
+    }
+  }, [props.Component]);
+  useEffect(() => {
+    return () => {
+      portal?.unmount(portalId.current);
+    };
+  }, []);
+  return portal;
 };
