@@ -126,21 +126,24 @@ export const usePortal = () => {
 export type UsePortalComponentProps = {
   name: string;
   Component: ReactNode;
+  disable?: boolean;
 };
 export const usePortalComponent = (props: UsePortalComponentProps) => {
   const portalId = useRef('');
   const portal = usePortal();
   useEffect(() => {
-    if (portalId.current) {
-      portal?.update(portalId.current, props.Component);
-    } else {
-      portalId.current = getSequantialRandomId(props.name);
-      portal?.mount(portalId.current, props.Component);
+    if (!props.disable) {
+      if (portalId.current) {
+        portal?.update(portalId.current, props.Component);
+      } else {
+        portalId.current = getSequantialRandomId(props.name);
+        portal?.mount(portalId.current, props.Component);
+      }
     }
-  }, [props.Component]);
+  }, [props.Component, props.disable]);
   useEffect(() => {
     return () => {
-      portal?.unmount(portalId.current);
+      if (portalId.current) portal?.unmount(portalId.current);
     };
   }, []);
   return portal;
