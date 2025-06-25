@@ -6,7 +6,7 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 
-interface PressProps extends ViewProps {
+export interface PressProps extends ViewProps {
   onPress?: (e: GestureResponderEvent) => void;
   onLongPress?: (e: GestureResponderEvent) => void;
   disabled?: boolean;
