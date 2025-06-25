@@ -43,9 +43,14 @@ export function BaseButton(props: PropsWithChildren<ButtonProps>) {
       }}
       onPress={props.onPress}
     >
-      <ViewComponent style={[configuredStyles, props.style]}>
+      <ViewComponent
+        style={[configuredStyles, props.style]}
+        //@ts-ignore
+        className={props.clasName}
+      >
         {props.leftComponent}
         <BaseText
+          className={props.textClasName}
           animate={props.animateText}
           animatedStyle={props.textStyle}
           fontSize={props.fontSize || sizes.fontSize}

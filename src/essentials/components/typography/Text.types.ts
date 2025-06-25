@@ -18,6 +18,7 @@ export interface BaseTextProps extends Spacing, TextProps {
   animate?: boolean;
   center?: boolean;
   onPress?: (event: GestureResponderEvent) => void;
+  className?: string | undefined;
 }
 
 export type FontStyle =

@@ -20,6 +20,8 @@ export type RadiusSize =
 export type ButtonSize = 'small' | 'large' | 'medium' | 'auto' | 'wide';
 
 export interface ButtonProps {
+  clasName?: string | undefined;
+  textClasName?: string | undefined;
   borderColor?: string;
   borderRadius?: RadiusSize;
   borderWidth?: BorderSize;

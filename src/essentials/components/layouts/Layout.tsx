@@ -23,6 +23,7 @@ export type LayoutProps<Scrollable extends boolean | undefined = undefined> = {
    * This number will be used as a percentage of the screen height, where 100 is 100% screen height
    */
   height?: number;
+  className?: string | number;
   style?: StyleProp<ViewStyle>;
   center?: boolean;
   centerX?: boolean;

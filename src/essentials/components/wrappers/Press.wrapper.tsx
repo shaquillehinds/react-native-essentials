@@ -14,6 +14,7 @@ interface PressProps extends ViewProps {
   stopPropagation?: boolean;
   preventDefault?: boolean;
   persist?: boolean;
+  className?: string | undefined;
 }
 
 export function Press({
