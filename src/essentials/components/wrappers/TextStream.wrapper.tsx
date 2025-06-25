@@ -1,6 +1,6 @@
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Text, type TextProps } from 'react-native';
-import { wait } from '@shaquillehinds/react-native-essentials';
+import { wait } from '../../utils';
 
 export type TextStreamRef = {
   startStream: () => void;
