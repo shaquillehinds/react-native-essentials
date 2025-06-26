@@ -10,6 +10,7 @@ import {
   buttonSizes,
   radiusSizes,
 } from '../../utils/sizeCalculations';
+import { normalize } from '../../utils';
 
 export function BaseButton(props: PropsWithChildren<ButtonProps>) {
   const sizes = buttonSizes[props.buttonSize || 'medium'];
@@ -47,7 +48,7 @@ export function BaseButton(props: PropsWithChildren<ButtonProps>) {
         {props.leftComponent}
         <BaseText
           animate={props.animateText}
-          animatedStyle={props.textStyle}
+          animatedStyle={[{ lineHeight: normalize(19) }, props.textStyle]}
           fontSize={props.fontSize || sizes.fontSize}
           fontStyle={props.fontStyle || 'Medium'}
           customColor={props.customFontColor}
