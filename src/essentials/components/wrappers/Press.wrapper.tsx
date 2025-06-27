@@ -10,6 +10,7 @@ export interface PressProps extends ViewProps {
   onPress?: (e: GestureResponderEvent) => void;
   onLongPress?: (e: GestureResponderEvent) => void;
   disabled?: boolean;
+  activationDelay?: number;
   activeOpacity?: number;
   stopPropagation?: boolean;
   preventDefault?: boolean;
@@ -19,7 +20,13 @@ export interface PressProps extends ViewProps {
 export function Press({
   style,
   disabled,
+  onPress,
+  onLongPress,
   activeOpacity,
+  activationDelay,
+  stopPropagation,
+  preventDefault,
+  persist,
   ...props
 }: PressProps) {
   const activateRef = useRef(false);
@@ -37,9 +44,9 @@ export function Press({
       {...props}
       style={[style, animatedStyle]}
       onTouchStart={(e) => {
-        props.stopPropagation && e.stopPropagation();
-        props.preventDefault && e.preventDefault();
-        props.persist && e.persist();
+        stopPropagation && e.stopPropagation();
+        preventDefault && e.preventDefault();
+        persist && e.persist();
         if (disabled) return;
         activateRef.current = true;
         scale.value = withSpring(0.95);
@@ -53,16 +60,18 @@ export function Press({
           scale.value = withSpring(1);
           opacity.value = withSpring(1);
           activateRef.current = false;
-          props.onLongPress?.(e);
+          onLongPress?.(e);
         }, 1000);
       }}
       onTouchEnd={(e) => {
-        props.stopPropagation && e.stopPropagation();
-        props.preventDefault && e.preventDefault();
-        props.persist && e.persist();
+        stopPropagation && e.stopPropagation();
+        preventDefault && e.preventDefault();
+        persist && e.persist();
         if (disabled) return;
         if (!activateRef.current) return;
-        setTimeout(() => props.onPress?.(e), 100);
+        activationDelay
+          ? setTimeout(() => onPress?.(e), activationDelay)
+          : onPress?.(e);
       }}
       onTouchEndCapture={() => {
         setTimeout(() => {
