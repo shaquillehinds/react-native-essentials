@@ -7,6 +7,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 export interface PressProps extends ViewProps {
+  disableAnimation?: boolean;
   onPress?: (e: GestureResponderEvent) => void;
   onLongPress?: (e: GestureResponderEvent) => void;
   disabled?: boolean;
@@ -23,6 +24,7 @@ export function Press({
   onPress,
   onLongPress,
   activeOpacity,
+  disableAnimation,
   activationDelay,
   stopPropagation,
   preventDefault,
@@ -42,7 +44,7 @@ export function Press({
   return (
     <Animated.View
       {...props}
-      style={[style, animatedStyle]}
+      style={[style, disableAnimation ? {} : animatedStyle]}
       onTouchStart={(e) => {
         stopPropagation && e.stopPropagation();
         preventDefault && e.preventDefault();
