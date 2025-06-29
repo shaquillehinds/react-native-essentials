@@ -16,6 +16,7 @@ export function BaseInput({
   if (LeftComponent) width -= 10;
   if (RightComponent) width -= 10;
   const layoutStyle = { width: '100%' as DimensionValue };
+  const inputStyle = { width: '100%' as DimensionValue };
   return (
     <RowLayout
       center
@@ -28,9 +29,17 @@ export function BaseInput({
       <RowLayout style={{ width: `${width}%` }}>
         {LeftComponent}
         {TextInputComponent ? (
-          <TextInputComponent ref={refTextInput} {...textInputProps} />
+          <TextInputComponent
+            ref={refTextInput}
+            {...textInputProps}
+            style={[inputStyle, textInputProps.style]}
+          />
         ) : (
-          <TextInput ref={refTextInput} {...textInputProps} />
+          <TextInput
+            ref={refTextInput}
+            {...textInputProps}
+            style={[inputStyle, textInputProps.style]}
+          />
         )}
       </RowLayout>
       {RightComponent}
