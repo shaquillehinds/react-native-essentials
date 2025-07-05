@@ -10,7 +10,7 @@ export type SafeResponderSnapshot = {
   target?: string;
 };
 
-export default function snapShotGestureResponderEvent(
+export function snapShotGestureResponderEvent(
   event: GestureResponderEvent
 ): SafeResponderSnapshot {
   const { pageX, pageY, locationX, locationY, timestamp, identifier, target } =
