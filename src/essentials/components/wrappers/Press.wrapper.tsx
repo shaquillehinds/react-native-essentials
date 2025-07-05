@@ -5,11 +5,17 @@ import Animated, {
   withSpring,
   useSharedValue,
 } from 'react-native-reanimated';
+import {
+  snapShotGestureResponderEvent,
+  type GestureResponderNativeEventSnapshot,
+} from '../../utils';
 
 export interface PressProps extends ViewProps {
   disableAnimation?: boolean;
   onPress?: (e: GestureResponderEvent) => void;
-  onLongPress?: (e: GestureResponderEvent) => void;
+  onLongPress?: (
+    nativeEventSnapshot: GestureResponderNativeEventSnapshot
+  ) => void;
   longPressDuration?: number;
   disabled?: boolean;
   activationDelay?: number;
@@ -34,7 +40,6 @@ export function Press({
   ...props
 }: PressProps) {
   const activateRef = useRef(false);
-  const activateLongPressRef = useRef(false);
 
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
@@ -60,12 +65,13 @@ export function Press({
           x: e.nativeEvent.pageX,
           y: e.nativeEvent.pageY,
         };
+        const snapshot = snapShotGestureResponderEvent(e);
         setTimeout(() => {
           if (!activateRef.current) return;
           scale.value = withSpring(1);
           opacity.value = withSpring(1);
           activateRef.current = false;
-          activateLongPressRef.current = true;
+          onLongPress?.(snapshot);
         }, longPressDuration || 800);
       }}
       onTouchEnd={(e) => {
@@ -74,8 +80,6 @@ export function Press({
         persist && e.persist();
         if (disabled) return;
         if (!activateRef.current) {
-          if (activateLongPressRef) onLongPress?.(e);
-          activateLongPressRef.current = false;
           return;
         }
         activationDelay
