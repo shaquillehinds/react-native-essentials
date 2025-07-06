@@ -13,5 +13,5 @@ export type BaseInputProps = {
       ref?: React.RefObject<TextInput>;
     }
   ) => React.JSX.Element;
-  refTextInput?: React.RefObject<TextInput>;
+  refTextInput?: React.MutableRefObject<TextInput | null>;
 } & LayoutProps;

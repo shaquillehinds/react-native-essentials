@@ -8,7 +8,7 @@ import {
 import { RowLayout } from '../layouts';
 import type { BaseInputProps } from './Input.types';
 import { isAndroid } from '../../constants/device.const';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 export function BaseInput({
   backgroundColor,
@@ -23,6 +23,7 @@ export function BaseInput({
   ...rest
 }: BaseInputProps) {
   const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<TextInput>(null);
   let width = 100;
   if (LeftComponent) width -= 10;
   if (RightComponent) width -= 10;
@@ -34,6 +35,7 @@ export function BaseInput({
       : blurredBorderColor || 'transparent',
   };
   const inputStyle: StyleProp<TextStyle> = { width: '100%' as DimensionValue };
+  if (refTextInput) refTextInput.current = inputRef.current;
   return (
     <RowLayout
       center
@@ -41,13 +43,17 @@ export function BaseInput({
       backgroundColor={backgroundColor}
       padding={[isAndroid ? 0.4 : 1.5, 4]}
       style={[layoutStyle, style]}
+      onTouchStart={(e) => {
+        inputRef.current?.focus();
+        rest.onTouchStart?.(e);
+      }}
       {...rest}
     >
       <RowLayout style={{ width: `${width}%` }}>
         {LeftComponent}
         {TextInputComponent ? (
           <TextInputComponent
-            ref={refTextInput}
+            ref={inputRef}
             placeholder={textInputProps.placeholder ?? 'Type here...'}
             style={[inputStyle, textInputProps.style]}
             {...textInputProps}
