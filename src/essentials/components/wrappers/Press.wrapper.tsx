@@ -93,6 +93,11 @@ export function Press({
           activateRef.current = false;
         }, 50);
       }}
+      onTouchCancel={() => {
+        scale.value = withSpring(1);
+        opacity.value = withSpring(1);
+        activateRef.current = false;
+      }}
       onTouchMove={(e) => {
         if (disabled) return;
         if (!activateRef.current) return;
