@@ -43,9 +43,9 @@ export function BaseInput({
       backgroundColor={backgroundColor}
       padding={[isAndroid ? 0.4 : 1.5, 4]}
       style={[layoutStyle, style]}
-      onTouchStart={(e) => {
+      onTouchEnd={(e) => {
         inputRef.current?.focus();
-        rest.onTouchStart?.(e);
+        rest.onTouchEnd?.(e);
       }}
       {...rest}
     >
@@ -68,7 +68,7 @@ export function BaseInput({
           />
         ) : (
           <TextInput
-            ref={refTextInput}
+            ref={inputRef}
             {...textInputProps}
             placeholder={textInputProps.placeholder ?? 'Type here...'}
             style={[inputStyle, textInputProps.style]}
