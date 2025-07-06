@@ -3,6 +3,8 @@ import type { LayoutProps } from '../layouts';
 
 export type BaseInputProps = {
   backgroundColor: string;
+  focusedBorderColor?: string;
+  blurredBorderColor?: string;
   textInputProps: TextInputProps;
   LeftComponent?: React.ReactNode;
   RightComponent?: React.ReactNode;
