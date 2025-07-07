@@ -6,3 +6,4 @@ export { wait } from './wait';
 export * from './layout';
 export * from './sizeCalculations';
 export * from './snapshots/snapShotGestureResponderEvent';
+export * from './createMMKVStorageAccessors';

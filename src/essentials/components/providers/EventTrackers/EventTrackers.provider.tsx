@@ -1,0 +1,126 @@
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { createStorageAccessors } from '../../../utils/createMMKVStorageAccessors';
+//prettier-ignore
+import type { EventTracker, EventTrackersContextValue, EventTrackersProviderProps, EventTrackersRecord } from './eventTrackersProvider.types';
+import { Scheduler } from '../../../utils';
+
+//prettier-ignore
+export const EventTrackersContext = createContext<EventTrackersContextValue | undefined>(undefined);
+export const eventsStorage =
+  createStorageAccessors<EventTrackersRecord>('events-trackers');
+
+export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
+  const storedEvents = useRef<EventTrackersRecord>(
+    eventsStorage.retrieve() || {}
+  );
+  const inProgressTrackers = useRef<Record<string, Scheduler.Schedule>>({});
+
+  const [events, setEvents] = useState<EventTracker[]>(
+    Object.values(storedEvents.current)
+  );
+
+  const initalizeTracker = useCallback((eventTracker: EventTracker) => {
+    if (eventTracker.status === 'in_progress') {
+      inProgressTrackers.current[eventTracker.id] = new Scheduler.Schedule(
+        async () => {
+          const currentEvent = storedEvents.current[eventTracker.id];
+          if (!currentEvent)
+            return inProgressTrackers.current[eventTracker.id]?.stop();
+          if (
+            eventTracker.maxTimeInProgress &&
+            Date.now() - currentEvent.createdAt > eventTracker.maxTimeInProgress
+          ) {
+            inProgressTrackers.current[currentEvent.id]?.stop();
+            currentEvent.status = 'failed';
+            storedEvents.current[currentEvent.id] = currentEvent;
+            eventsStorage.store(storedEvents.current);
+            return;
+          }
+          if (eventTracker.expires && Date.now() > eventTracker.expires) {
+            inProgressTrackers.current[currentEvent.id]?.stop();
+            delete storedEvents.current[currentEvent.id];
+            eventsStorage.store(storedEvents.current);
+            return;
+          }
+          try {
+            const update = await eventTracker.statusCheckFn(eventTracker);
+            const previousEvent = storedEvents.current[update.id];
+            if (previousEvent?.status !== update.status) {
+              if (update.status !== 'in_progress')
+                inProgressTrackers.current[update.id]?.stop();
+              update.updatedAt = Date.now();
+              setEvents((prev) =>
+                prev.map((p) => (p.id === update.id ? update : p))
+              );
+              storedEvents.current[update.id] = update;
+              eventsStorage.store(storedEvents.current);
+            }
+          } catch (error) {
+            console.error($lf(66), error);
+          }
+        },
+        eventTracker.statusCheckInterval || 30000
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    for (const eventTracker of Object.values(storedEvents.current)) {
+      if (eventTracker.expires && Date.now() > eventTracker.expires) {
+        delete storedEvents.current[eventTracker.id];
+        eventsStorage.store(storedEvents.current);
+      } else initalizeTracker(eventTracker);
+    }
+  }, []);
+
+  const addEventTracker: EventTrackersContextValue['addEventTracker'] =
+    useCallback((eventTracker) => {
+      const newEventTracker: EventTracker = {
+        ...eventTracker,
+        updatedAt: Date.now(),
+        createdAt: Date.now(),
+      };
+      storedEvents.current[eventTracker.id] = newEventTracker;
+      eventsStorage.store(storedEvents.current);
+      setEvents((prev) => [newEventTracker, ...prev]);
+      initalizeTracker(newEventTracker);
+    }, []);
+
+  const removeEventTracker: EventTrackersContextValue['removeEventTracker'] =
+    useCallback((id) => {
+      inProgressTrackers.current[id]?.stop();
+      if (storedEvents.current[id]) {
+        delete storedEvents.current[id];
+        eventsStorage.store(storedEvents.current);
+        setEvents((prev) => prev.filter((e) => e.id !== id));
+      }
+    }, []);
+
+  return (
+    <EventTrackersContext.Provider
+      value={{ events, addEventTracker, removeEventTracker }}
+    >
+      {props.children}
+    </EventTrackersContext.Provider>
+  );
+};
+
+export const useEventTracker = () => {
+  const context = useContext(EventTrackersContext);
+  if (!context) {
+    return null;
+  }
+  return context;
+};
+
+function $lf(n: number) {
+  return '$lf|providers/EventTrackers/EventTrackers.provider.tsx:' + n + ' >';
+  // Automatically injected by Log Location Injector vscode extension
+}
