@@ -74,6 +74,7 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
         },
         eventTracker.statusCheckInterval || 30000
       );
+      inProgressTrackers.current[eventTracker.id]?.start();
     }
   }, []);
 
