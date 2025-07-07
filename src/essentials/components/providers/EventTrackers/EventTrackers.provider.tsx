@@ -38,13 +38,21 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
           if (!currentEvent)
             return inProgressTrackers.current[eventTracker.id]?.stop();
 
+          const stopAndDelete = () => {
+            inProgressTrackers.current[eventTracker.id]?.stop();
+            delete storedEvents.current[currentEvent.id];
+            eventsStorage.store(storedEvents.current);
+          };
+
           try {
             const checkStatusFn =
               props.statusCheckFnRegistry[currentEvent.statusCheckFnId];
-            if (!checkStatusFn)
+            if (!checkStatusFn) {
+              stopAndDelete();
               throw Error(
                 'Check status function not found, please make sure the id of the event matches an id in theregistry.'
               );
+            }
             const update = await checkStatusFn({
               ...currentEvent,
             });
@@ -60,7 +68,7 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
               eventsStorage.store(storedEvents.current);
             }
           } catch (error) {
-            console.error($lf(59), error);
+            console.error($lf(71), error);
           }
           if (
             storedEvents.current[currentEvent.id]?.status === 'in_progress' &&
@@ -74,10 +82,7 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
             return;
           }
           if (currentEvent.expires && Date.now() > currentEvent.expires) {
-            inProgressTrackers.current[currentEvent.id]?.stop();
-            delete storedEvents.current[currentEvent.id];
-            eventsStorage.store(storedEvents.current);
-            return;
+            return stopAndDelete();
           }
         },
         eventTracker.statusCheckInterval || 30000
