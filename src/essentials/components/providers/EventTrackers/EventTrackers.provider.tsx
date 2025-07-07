@@ -39,7 +39,15 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
             return inProgressTrackers.current[eventTracker.id]?.stop();
 
           try {
-            const update = await eventTracker.statusCheckFn(eventTracker);
+            const checkStatusFn =
+              props.statusCheckFnRegistry[currentEvent.statusCheckFnId];
+            if (!checkStatusFn)
+              throw Error(
+                'Check status function not found, please make sure the id of the event matches an id in theregistry.'
+              );
+            const update = await checkStatusFn({
+              ...currentEvent,
+            });
             const previousEvent = storedEvents.current[update.id];
             if (previousEvent?.status !== update.status) {
               if (update.status !== 'in_progress')
@@ -52,12 +60,12 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
               eventsStorage.store(storedEvents.current);
             }
           } catch (error) {
-            console.error($lf(55), error);
+            console.error($lf(59), error);
           }
           if (
-            storedEvents.current[eventTracker.id]?.status === 'in_progress' &&
-            eventTracker.maxTimeInProgress &&
-            Date.now() - currentEvent.createdAt > eventTracker.maxTimeInProgress
+            storedEvents.current[currentEvent.id]?.status === 'in_progress' &&
+            currentEvent.maxTimeInProgress &&
+            Date.now() - currentEvent.createdAt > currentEvent.maxTimeInProgress
           ) {
             inProgressTrackers.current[currentEvent.id]?.stop();
             currentEvent.status = 'failed';
@@ -65,7 +73,7 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
             eventsStorage.store(storedEvents.current);
             return;
           }
-          if (eventTracker.expires && Date.now() > eventTracker.expires) {
+          if (currentEvent.expires && Date.now() > currentEvent.expires) {
             inProgressTrackers.current[currentEvent.id]?.stop();
             delete storedEvents.current[currentEvent.id];
             eventsStorage.store(storedEvents.current);
