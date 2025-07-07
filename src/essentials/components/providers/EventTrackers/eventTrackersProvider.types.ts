@@ -21,8 +21,10 @@ export type EventTracker = {
   statusCheckFn: (props: EventTracker) => Promise<EventTracker>;
 } & EventData;
 export type EventTrackersRecord = Record<string, EventTracker>;
-export interface EventTrackersContextValue {
+export interface TrackerEventsContextValue {
   events: EventTracker[];
+}
+export interface EventTrackersContextValue {
   addEventTracker: (
     event: Omit<EventTracker, 'updatedAt' | 'createdAt'>
   ) => void;

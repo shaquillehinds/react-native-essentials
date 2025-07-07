@@ -3,16 +3,20 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
 import { createStorageAccessors } from '../../../utils/createMMKVStorageAccessors';
 //prettier-ignore
-import type { EventTracker, EventTrackersContextValue, EventTrackersProviderProps, EventTrackersRecord } from './eventTrackersProvider.types';
+import type { EventTracker, EventTrackersContextValue, EventTrackersProviderProps, EventTrackersRecord, TrackerEventsContextValue } from './eventTrackersProvider.types';
 import { Scheduler } from '../../../utils';
 
 //prettier-ignore
 export const EventTrackersContext = createContext<EventTrackersContextValue | undefined>(undefined);
+export const TrackerEventsContext = createContext<
+  TrackerEventsContextValue | undefined
+>(undefined);
 export const eventsStorage =
   createStorageAccessors<EventTrackersRecord>('events-trackers');
 
@@ -33,22 +37,7 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
           const currentEvent = storedEvents.current[eventTracker.id];
           if (!currentEvent)
             return inProgressTrackers.current[eventTracker.id]?.stop();
-          if (
-            eventTracker.maxTimeInProgress &&
-            Date.now() - currentEvent.createdAt > eventTracker.maxTimeInProgress
-          ) {
-            inProgressTrackers.current[currentEvent.id]?.stop();
-            currentEvent.status = 'failed';
-            storedEvents.current[currentEvent.id] = currentEvent;
-            eventsStorage.store(storedEvents.current);
-            return;
-          }
-          if (eventTracker.expires && Date.now() > eventTracker.expires) {
-            inProgressTrackers.current[currentEvent.id]?.stop();
-            delete storedEvents.current[currentEvent.id];
-            eventsStorage.store(storedEvents.current);
-            return;
-          }
+
           try {
             const update = await eventTracker.statusCheckFn(eventTracker);
             const previousEvent = storedEvents.current[update.id];
@@ -63,7 +52,24 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
               eventsStorage.store(storedEvents.current);
             }
           } catch (error) {
-            console.error($lf(66), error);
+            console.error($lf(55), error);
+          }
+          if (
+            storedEvents.current[eventTracker.id]?.status === 'in_progress' &&
+            eventTracker.maxTimeInProgress &&
+            Date.now() - currentEvent.createdAt > eventTracker.maxTimeInProgress
+          ) {
+            inProgressTrackers.current[currentEvent.id]?.stop();
+            currentEvent.status = 'failed';
+            storedEvents.current[currentEvent.id] = currentEvent;
+            eventsStorage.store(storedEvents.current);
+            return;
+          }
+          if (eventTracker.expires && Date.now() > eventTracker.expires) {
+            inProgressTrackers.current[currentEvent.id]?.stop();
+            delete storedEvents.current[currentEvent.id];
+            eventsStorage.store(storedEvents.current);
+            return;
           }
         },
         eventTracker.statusCheckInterval || 30000
@@ -103,17 +109,27 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
       }
     }, []);
 
+  const value = useMemo(() => ({ addEventTracker, removeEventTracker }), []);
+
   return (
-    <EventTrackersContext.Provider
-      value={{ events, addEventTracker, removeEventTracker }}
-    >
-      {props.children}
-    </EventTrackersContext.Provider>
+    <TrackerEventsContext.Provider value={{ events }}>
+      <EventTrackersContext.Provider value={value}>
+        {props.children}
+      </EventTrackersContext.Provider>
+    </TrackerEventsContext.Provider>
   );
 };
 
 export const useEventTracker = () => {
   const context = useContext(EventTrackersContext);
+  if (!context) {
+    return null;
+  }
+  return context;
+};
+
+export const useTrackerEvents = () => {
+  const context = useContext(TrackerEventsContext);
   if (!context) {
     return null;
   }
