@@ -24,6 +24,7 @@ export type EventTracker = {
 export type EventTrackersRecord = Record<string, EventTracker>;
 export interface TrackerEventsContextValue {
   events: EventTracker[];
+  markEventsAsSeen: () => void;
 }
 export interface EventTrackersContextValue {
   addEventTracker: (
@@ -38,3 +39,6 @@ export type EventTrackersProviderProps = {
   defaultMaxInProgressTime?: number;
   defaultStatusCheckInterval?: number;
 };
+
+export type SeenEventsRecord = Record<string, boolean>;
+export type UnSeenEventsRecord = Record<string, boolean>;

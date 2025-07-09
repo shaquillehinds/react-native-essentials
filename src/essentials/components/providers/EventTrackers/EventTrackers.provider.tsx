@@ -1,15 +1,8 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+//prettier-ignore
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import { createStorageAccessors } from '../../../utils/createMMKVStorageAccessors';
 //prettier-ignore
-import type { EventTracker, EventTrackersContextValue, EventTrackersProviderProps, EventTrackersRecord, TrackerEventsContextValue } from './eventTrackersProvider.types';
+import type { EventTracker, EventTrackersContextValue, EventTrackersProviderProps, EventTrackersRecord, SeenEventsRecord, UnSeenEventsRecord, TrackerEventsContextValue } from './eventTrackersProvider.types';
 import { Scheduler } from '../../../utils';
 
 //prettier-ignore
@@ -19,6 +12,12 @@ export const TrackerEventsContext = createContext<
 >(undefined);
 export const eventsStorage =
   createStorageAccessors<EventTrackersRecord>('events-trackers');
+
+export const seenEventsStorage =
+  createStorageAccessors<SeenEventsRecord>('seen-events');
+
+export const unSeenEventsStorage =
+  createStorageAccessors<UnSeenEventsRecord>('un-seen-events');
 
 export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
   const storedEvents = useRef<EventTrackersRecord>(
@@ -30,6 +29,54 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
     Object.values(storedEvents.current)
   );
 
+  const seenEvents = useRef<SeenEventsRecord>(
+    seenEventsStorage.retrieve() || {}
+  );
+  const unSeenEvents = useRef<SeenEventsRecord>(
+    unSeenEventsStorage.retrieve() || {}
+  );
+
+  const addUnSeenEvent = useCallback((eventId: string) => {
+    unSeenEvents.current[eventId] = true;
+    seenEvents.current[eventId] = false;
+    seenEventsStorage.store(seenEvents.current);
+    unSeenEventsStorage.store(unSeenEvents.current);
+  }, []);
+
+  const markUnSeenAsSeen = useCallback(() => {
+    for (const unseen in unSeenEvents.current) {
+      unSeenEvents.current[unseen] = false;
+      seenEvents.current[unseen] = true;
+    }
+    seenEventsStorage.store(seenEvents.current);
+    unSeenEventsStorage.store(unSeenEvents.current);
+  }, []);
+  const deleteUnSeenAndSeen = useCallback((eventid: string) => {
+    delete unSeenEvents.current[eventid];
+    delete seenEvents.current[eventid];
+    seenEventsStorage.store(seenEvents.current);
+    unSeenEventsStorage.store(unSeenEvents.current);
+  }, []);
+
+  const storeEvent = useCallback((e: EventTracker, update?: Boolean) => {
+    if (!update) e.createdAt = Date.now();
+    e.updatedAt = Date.now();
+    storedEvents.current[e.id] = e;
+    eventsStorage.store(storedEvents.current);
+    update
+      ? setEvents((prev) => prev.map((ev) => (ev.id === e.id ? e : ev)))
+      : setEvents((prev) => [...prev, e]);
+    addUnSeenEvent(e.id);
+  }, []);
+
+  const deleteEvent = useCallback((e: EventTracker) => {
+    delete storedEvents.current[e.id];
+    eventsStorage.store(storedEvents.current);
+    setEvents((prev) => prev.filter((ev) => ev.id !== e.id));
+    inProgressTrackers.current[e.id]?.stop();
+    deleteUnSeenAndSeen(e.id);
+  }, []);
+
   const initalizeTracker = useCallback((eventTracker: EventTracker) => {
     if (eventTracker.status === 'in_progress') {
       inProgressTrackers.current[eventTracker.id] = new Scheduler.Schedule(
@@ -38,17 +85,11 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
           if (!currentEvent)
             return inProgressTrackers.current[eventTracker.id]?.stop();
 
-          const stopAndDelete = () => {
-            inProgressTrackers.current[eventTracker.id]?.stop();
-            delete storedEvents.current[currentEvent.id];
-            eventsStorage.store(storedEvents.current);
-          };
-
           try {
             const checkStatusFn =
               props.statusCheckFnRegistry[currentEvent.statusCheckFnId];
             if (!checkStatusFn) {
-              stopAndDelete();
+              deleteEvent(eventTracker);
               throw Error(
                 'Check status function not found, please make sure the id of the event matches an id in theregistry.'
               );
@@ -60,15 +101,10 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
             if (previousEvent?.status !== update.status) {
               if (update.status !== 'in_progress')
                 inProgressTrackers.current[update.id]?.stop();
-              update.updatedAt = Date.now();
-              setEvents((prev) =>
-                prev.map((p) => (p.id === update.id ? update : p))
-              );
-              storedEvents.current[update.id] = update;
-              eventsStorage.store(storedEvents.current);
+              storeEvent(update, true);
             }
           } catch (error) {
-            console.error($lf(71), error);
+            console.error($lf(107), error);
           }
           if (
             storedEvents.current[currentEvent.id]?.status === 'in_progress' &&
@@ -77,12 +113,11 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
           ) {
             inProgressTrackers.current[currentEvent.id]?.stop();
             currentEvent.status = 'failed';
-            storedEvents.current[currentEvent.id] = currentEvent;
-            eventsStorage.store(storedEvents.current);
+            storeEvent(currentEvent, true);
             return;
           }
           if (currentEvent.expires && Date.now() > currentEvent.expires) {
-            return stopAndDelete();
+            return deleteEvent(eventTracker);
           }
         },
         eventTracker.statusCheckInterval || 30000
@@ -94,8 +129,7 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
   useEffect(() => {
     for (const eventTracker of Object.values(storedEvents.current)) {
       if (eventTracker.expires && Date.now() > eventTracker.expires) {
-        delete storedEvents.current[eventTracker.id];
-        eventsStorage.store(storedEvents.current);
+        deleteEvent(eventTracker);
       } else initalizeTracker(eventTracker);
     }
   }, []);
@@ -107,26 +141,23 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
         updatedAt: Date.now(),
         createdAt: Date.now(),
       };
-      storedEvents.current[eventTracker.id] = newEventTracker;
-      eventsStorage.store(storedEvents.current);
-      setEvents((prev) => [newEventTracker, ...prev]);
+      storeEvent(newEventTracker);
       initalizeTracker(newEventTracker);
     }, []);
 
   const removeEventTracker: EventTrackersContextValue['removeEventTracker'] =
     useCallback((id) => {
-      inProgressTrackers.current[id]?.stop();
       if (storedEvents.current[id]) {
-        delete storedEvents.current[id];
-        eventsStorage.store(storedEvents.current);
-        setEvents((prev) => prev.filter((e) => e.id !== id));
+        deleteEvent(storedEvents.current[id]);
       }
     }, []);
 
   const value = useMemo(() => ({ addEventTracker, removeEventTracker }), []);
 
   return (
-    <TrackerEventsContext.Provider value={{ events }}>
+    <TrackerEventsContext.Provider
+      value={{ events, markEventsAsSeen: markUnSeenAsSeen }}
+    >
       <EventTrackersContext.Provider value={value}>
         {props.children}
       </EventTrackersContext.Provider>
