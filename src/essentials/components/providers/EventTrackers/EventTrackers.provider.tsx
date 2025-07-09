@@ -156,7 +156,11 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
 
   return (
     <TrackerEventsContext.Provider
-      value={{ events, markEventsAsSeen: markUnSeenAsSeen }}
+      value={{
+        events,
+        markEventsAsSeen: markUnSeenAsSeen,
+        seen: seenEvents.current,
+      }}
     >
       <EventTrackersContext.Provider value={value}>
         {props.children}

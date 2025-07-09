@@ -25,6 +25,7 @@ export type EventTrackersRecord = Record<string, EventTracker>;
 export interface TrackerEventsContextValue {
   events: EventTracker[];
   markEventsAsSeen: () => void;
+  seen: SeenEventsRecord;
 }
 export interface EventTrackersContextValue {
   addEventTracker: (
