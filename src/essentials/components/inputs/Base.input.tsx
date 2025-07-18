@@ -43,10 +43,6 @@ export function BaseInput({
       backgroundColor={backgroundColor}
       padding={[isAndroid ? 0.4 : 1.5, 4]}
       style={[layoutStyle, style]}
-      onTouchEnd={(e) => {
-        inputRef.current?.focus();
-        rest.onTouchEnd?.(e);
-      }}
       {...rest}
     >
       <RowLayout style={{ width: `${width}%` }}>
@@ -57,6 +53,10 @@ export function BaseInput({
             placeholder={textInputProps.placeholder ?? 'Type here...'}
             style={[inputStyle, textInputProps.style]}
             {...textInputProps}
+            onTouchEnd={(e) => {
+              inputRef.current?.focus();
+              textInputProps.onTouchEnd?.(e);
+            }}
             onFocus={(e) => {
               setIsFocused(true);
               textInputProps.onFocus?.(e);
@@ -72,6 +72,10 @@ export function BaseInput({
             {...textInputProps}
             placeholder={textInputProps.placeholder ?? 'Type here...'}
             style={[inputStyle, textInputProps.style]}
+            onTouchEnd={(e) => {
+              inputRef.current?.focus();
+              textInputProps.onTouchEnd?.(e);
+            }}
             onFocus={(e) => {
               setIsFocused(true);
               textInputProps.onFocus?.(e);
