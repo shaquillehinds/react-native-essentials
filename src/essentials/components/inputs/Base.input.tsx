@@ -34,7 +34,9 @@ export function BaseInput({
       ? focusedBorderColor || '#4A87F2'
       : blurredBorderColor || 'transparent',
   };
-  const inputStyle: StyleProp<TextStyle> = { width: '100%' as DimensionValue };
+  const inputStyle: StyleProp<TextStyle> = {
+    width: `${width}%` as DimensionValue,
+  };
   if (refTextInput) refTextInput.current = inputRef.current;
   return (
     <RowLayout
@@ -45,48 +47,46 @@ export function BaseInput({
       style={[layoutStyle, style]}
       {...rest}
     >
-      <RowLayout style={{ width: `${width}%` }}>
-        {LeftComponent}
-        {TextInputComponent ? (
-          <TextInputComponent
-            ref={inputRef}
-            placeholder={textInputProps.placeholder ?? 'Type here...'}
-            style={[inputStyle, textInputProps.style]}
-            {...textInputProps}
-            onTouchEnd={(e) => {
-              inputRef.current?.focus();
-              textInputProps.onTouchEnd?.(e);
-            }}
-            onFocus={(e) => {
-              setIsFocused(true);
-              textInputProps.onFocus?.(e);
-            }}
-            onBlur={(e) => {
-              setIsFocused(false);
-              textInputProps.onBlur?.(e);
-            }}
-          />
-        ) : (
-          <TextInput
-            ref={inputRef}
-            {...textInputProps}
-            placeholder={textInputProps.placeholder ?? 'Type here...'}
-            style={[inputStyle, textInputProps.style]}
-            onTouchEnd={(e) => {
-              inputRef.current?.focus();
-              textInputProps.onTouchEnd?.(e);
-            }}
-            onFocus={(e) => {
-              setIsFocused(true);
-              textInputProps.onFocus?.(e);
-            }}
-            onBlur={(e) => {
-              setIsFocused(false);
-              textInputProps.onBlur?.(e);
-            }}
-          />
-        )}
-      </RowLayout>
+      {LeftComponent}
+      {TextInputComponent ? (
+        <TextInputComponent
+          ref={inputRef}
+          placeholder={textInputProps.placeholder ?? 'Type here...'}
+          style={[inputStyle, textInputProps.style]}
+          {...textInputProps}
+          onTouchEnd={(e) => {
+            inputRef.current?.focus();
+            textInputProps.onTouchEnd?.(e);
+          }}
+          onFocus={(e) => {
+            setIsFocused(true);
+            textInputProps.onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setIsFocused(false);
+            textInputProps.onBlur?.(e);
+          }}
+        />
+      ) : (
+        <TextInput
+          ref={inputRef}
+          {...textInputProps}
+          placeholder={textInputProps.placeholder ?? 'Type here...'}
+          style={[inputStyle, textInputProps.style]}
+          onTouchEnd={(e) => {
+            inputRef.current?.focus();
+            textInputProps.onTouchEnd?.(e);
+          }}
+          onFocus={(e) => {
+            setIsFocused(true);
+            textInputProps.onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setIsFocused(false);
+            textInputProps.onBlur?.(e);
+          }}
+        />
+      )}
       {RightComponent}
     </RowLayout>
   );
