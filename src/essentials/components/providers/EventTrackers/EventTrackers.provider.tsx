@@ -60,6 +60,7 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
 
   const storeEvent = useCallback((e: EventTracker, update?: Boolean) => {
     if (!update) e.createdAt = Date.now();
+    if (storedEvents.current[e.id]) update = true;
     e.updatedAt = Date.now();
     storedEvents.current[e.id] = e;
     eventsStorage.store(storedEvents.current);
@@ -104,7 +105,7 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
               storeEvent(update, true);
             }
           } catch (error) {
-            console.error($lf(107), error);
+            console.error($lf(108), error);
           }
           if (
             storedEvents.current[currentEvent.id]?.status === 'in_progress' &&
