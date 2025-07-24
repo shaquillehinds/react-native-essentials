@@ -1,4 +1,10 @@
-import { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, {
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+  type PropsWithChildren,
+} from 'react';
 import { Text, type TextProps } from 'react-native';
 import { wait } from '../../utils';
 
@@ -7,23 +13,27 @@ export type TextStreamRef = {
   stopStream: () => void;
 };
 
-export type TextStreamProps = {
+export type TextStreamProps<T extends TextProps> = {
   ref?: React.Ref<TextStreamRef>;
   autoStream?: boolean;
   startStreamDelay?: number;
   streamCharacterDelay?: number;
+  CustomTextComponent?: (
+    props: PropsWithChildren<TextProps>
+  ) => React.JSX.Element;
   onStreamFinish?: () => void;
-} & TextProps;
+} & T;
 
-export function TextStream({
+export function TextStream<T extends TextProps>({
   ref,
   autoStream,
   onStreamFinish,
   startStreamDelay,
   streamCharacterDelay,
+  CustomTextComponent,
   children,
   ...rest
-}: TextStreamProps) {
+}: TextStreamProps<T>) {
   const [streamed, setStreamed] = useState('');
   const [streamStart, setStreamStart] = useState(!!autoStream);
   const originalTextRef = useRef('');
@@ -80,5 +90,7 @@ export function TextStream({
     })();
   }, [streamStart, children]);
 
+  if (CustomTextComponent)
+    return <CustomTextComponent {...rest}>{streamed}</CustomTextComponent>;
   return <Text {...rest}>{streamed}</Text>;
 }
