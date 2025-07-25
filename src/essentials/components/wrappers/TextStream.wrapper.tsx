@@ -18,6 +18,8 @@ export type TextStreamProps<T extends TextProps> = {
   autoStream?: boolean;
   startStreamDelay?: number;
   streamCharacterDelay?: number;
+  skipCharacterDelayInterval?: number;
+  skipCharacterDelayAmount?: number;
   CustomTextComponent?: (
     props: PropsWithChildren<TextProps>
   ) => React.JSX.Element;
@@ -30,6 +32,8 @@ export function TextStream<T extends TextProps>({
   onStreamFinish,
   startStreamDelay,
   streamCharacterDelay,
+  skipCharacterDelayInterval,
+  skipCharacterDelayAmount,
   CustomTextComponent,
   children,
   ...rest
@@ -75,13 +79,21 @@ export function TextStream<T extends TextProps>({
         setStreamed(textToStream);
         return setStreamStart(false);
       }
+      let toSkip = 0;
       if (streamStart || originalTextCopy !== textToStream) {
         await wait(startStreamDelay);
         for (let i = startIndex; i < textToStream.length; i++) {
           lastLetterIndex.current = i;
           if (textToStream.length !== originalTextRef.current.length) return;
-          await wait(streamCharacterDelay || 15);
-          setStreamed(textToStream.slice(0, i));
+          if (toSkip > 0) toSkip--;
+          else if (
+            skipCharacterDelayInterval &&
+            i % skipCharacterDelayInterval === 0
+          )
+            toSkip = skipCharacterDelayAmount ?? 0;
+          else await wait(streamCharacterDelay || 15);
+          const streaming = textToStream.slice(0, i);
+          setStreamed(streaming);
         }
       }
       setStreamed(textToStream);
