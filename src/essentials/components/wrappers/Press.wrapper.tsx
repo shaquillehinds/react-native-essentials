@@ -23,6 +23,8 @@ export interface PressProps extends ViewProps {
   stopPropagation?: boolean;
   preventDefault?: boolean;
   persist?: boolean;
+  disableDoubleTapProtection?: boolean;
+  minDoubleTapProtectionDuration?: number;
 }
 
 export function Press({
@@ -37,17 +39,33 @@ export function Press({
   stopPropagation,
   preventDefault,
   persist,
+  disableDoubleTapProtection,
+  minDoubleTapProtectionDuration,
   ...props
 }: PressProps) {
   const activateRef = useRef(false);
 
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
+
   const touchStartPosition = useRef({ x: 0, y: 0 });
+  const prevActivatedTime = useRef(0);
+  const longPressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const minDurationToActivateAgain = minDoubleTapProtectionDuration || 750;
+
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
     opacity: disabled ? 0.5 : opacity.value,
   }));
+
+  const resetPress = () => {
+    setTimeout(() => {
+      scale.value = withSpring(1);
+      opacity.value = withSpring(1);
+      activateRef.current = false;
+    }, 50);
+  };
 
   return (
     <Animated.View
@@ -57,7 +75,16 @@ export function Press({
         stopPropagation && e.stopPropagation();
         preventDefault && e.preventDefault();
         persist && e.persist();
-        if (disabled) return;
+        if (
+          disabled ||
+          (!disableDoubleTapProtection &&
+            Date.now() - prevActivatedTime.current < minDurationToActivateAgain)
+        ) {
+          activateRef.current = false;
+          return;
+        }
+        if (longPressTimeoutRef.current)
+          clearTimeout(longPressTimeoutRef.current);
         activateRef.current = true;
         scale.value = withSpring(0.95);
         opacity.value = withSpring(activeOpacity || 0.9);
@@ -66,7 +93,7 @@ export function Press({
           y: e.nativeEvent.pageY,
         };
         const snapshot = snapShotGestureResponderEvent(e);
-        setTimeout(() => {
+        longPressTimeoutRef.current = setTimeout(() => {
           if (!activateRef.current) return;
           scale.value = withSpring(1);
           opacity.value = withSpring(1);
@@ -78,28 +105,15 @@ export function Press({
         stopPropagation && e.stopPropagation();
         preventDefault && e.preventDefault();
         persist && e.persist();
-        if (disabled) return;
-        if (!activateRef.current) {
-          return;
-        }
+        if (!activateRef.current) return;
         activationDelay
           ? setTimeout(() => onPress?.(e), activationDelay)
           : onPress?.(e);
+        prevActivatedTime.current = Date.now();
       }}
-      onTouchEndCapture={() => {
-        setTimeout(() => {
-          scale.value = withSpring(1);
-          opacity.value = withSpring(1);
-          activateRef.current = false;
-        }, 50);
-      }}
-      onTouchCancel={() => {
-        scale.value = withSpring(1);
-        opacity.value = withSpring(1);
-        activateRef.current = false;
-      }}
+      onTouchEndCapture={resetPress}
+      onTouchCancel={resetPress}
       onTouchMove={(e) => {
-        if (disabled) return;
         if (!activateRef.current) return;
         const maxDistance = 10;
         const isDisabled =
@@ -107,11 +121,7 @@ export function Press({
             maxDistance ||
           Math.abs(e.nativeEvent.pageY - touchStartPosition.current.y) >
             maxDistance;
-        if (isDisabled) {
-          scale.value = withSpring(1);
-          opacity.value = withSpring(1);
-          activateRef.current = false;
-        }
+        if (isDisabled) resetPress();
       }}
     />
   );
