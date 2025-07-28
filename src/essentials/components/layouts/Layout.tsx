@@ -75,7 +75,7 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
     alignSelf: alignSelf,
     position: absolute ? 'absolute' : undefined,
     flex: flex?.[0],
-    flexShrink: flex?.[1],
+    flexShrink: flex?.[1] ?? 1,
     flexBasis: flex?.[2],
   };
   const contentStyle: ViewStyle = {
