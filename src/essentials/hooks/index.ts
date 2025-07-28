@@ -17,3 +17,4 @@ export {
 } from './useScrollableItems';
 export { useTimer, type UseTimerProps } from './useTimer';
 export { useDeviceOrientation } from './useDeviceOrientation';
+export * from './useViewDimensions';

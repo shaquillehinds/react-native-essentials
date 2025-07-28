@@ -8,24 +8,36 @@ import {
   type FlexAlignType,
   type FlexStyle,
   type ScrollViewProps,
+  type DimensionValue,
 } from 'react-native';
 import type { Spacing } from '../../styles/Spacer/Spacer.types';
 import { transformSpacing } from '../../styles/Spacer/Spacer.style';
 import { relativeX, relativeY } from '../../utils/layout';
+import {
+  LoadingIndicator,
+  SkeletonViewIndicator,
+  type LoadingIndicatorProps,
+  type SkeletonLoadingIndicatorProps,
+} from '../indicators';
+
 export type LayoutProps<Scrollable extends boolean | undefined = undefined> = {
+  skeleton?: { colors?: SkeletonLoadingIndicatorProps['colors'] } | boolean;
+  loading?: Omit<LoadingIndicatorProps, 'width'> | boolean;
   scrollable?: Scrollable;
   wrap?: boolean;
   /**
-   * This number will be used as a percentage of the screen width, where 100 is 100% screen width
+   * This number will be used as a percentage of the screen width, where 100 is 100% screen width or can be a string of percantage width of it's container
    */
-  width?: number;
+  width?: DimensionValue;
   /**
-   * This number will be used as a percentage of the screen height, where 100 is 100% screen height
+   * This number will be used as a percentage of the screen height, where 100 is 100% screen height or can be a string of percantage height of it's container
    */
-  height?: number;
+  height?: DimensionValue;
+  flex?: [number] | [number, number] | [number, number, DimensionValue];
   style?: StyleProp<ViewStyle>;
   center?: boolean;
   centerX?: boolean;
+  absolute?: boolean;
   alignSelf?: FlexAlignType;
   spaceEven?: boolean;
   spaceBetween?: boolean;
@@ -40,6 +52,10 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
   wrap,
   height,
   width,
+  flex,
+  loading,
+  skeleton,
+  absolute,
   scrollable,
   margin,
   alignSelf,
@@ -54,9 +70,13 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
 }: PropsWithChildren<LayoutProps<Scrollable>>) {
   const viewStyle: ViewStyle = {
     ...transformSpacing({ margin: margin }),
-    width: width ? relativeX(width) : undefined,
-    height: height ? relativeY(height) : undefined,
+    width: typeof width === 'number' ? relativeX(width) : width,
+    height: typeof height === 'number' ? relativeY(height) : height,
     alignSelf: alignSelf,
+    position: absolute ? 'absolute' : undefined,
+    flex: flex?.[0],
+    flexShrink: flex?.[1],
+    flexBasis: flex?.[2],
   };
   const contentStyle: ViewStyle = {
     ...transformSpacing({ padding: padding }),
@@ -72,6 +92,18 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
           ? 'center'
           : undefined,
   };
+  if (loading)
+    return (
+      <LoadingIndicator {...(typeof loading === 'boolean' ? {} : loading)} />
+    );
+  if (skeleton)
+    return (
+      <SkeletonViewIndicator
+        {...props}
+        style={[contentStyle, viewStyle, style]}
+        colors={typeof skeleton !== 'boolean' ? skeleton.colors : undefined}
+      />
+    );
   if (scrollable) {
     viewStyle.overflow = 'visible';
     let contentContainerStyle: undefined | ViewStyle;
