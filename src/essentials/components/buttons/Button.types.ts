@@ -8,6 +8,7 @@ import type {
   TextStyle,
   ViewStyle,
 } from 'react-native';
+import type { LoadingIndicatorProps } from '../indicators';
 
 export type BorderSize = 'razor' | 'thin' | 'medium' | 'large';
 export type RadiusSize =
@@ -20,6 +21,8 @@ export type RadiusSize =
 export type ButtonSize = 'small' | 'large' | 'medium' | 'auto' | 'wide';
 
 export interface ButtonProps {
+  disabled?: boolean;
+  loading?: LoadingIndicatorProps | boolean;
   borderColor?: string;
   borderRadius?: RadiusSize;
   borderWidth?: BorderSize;

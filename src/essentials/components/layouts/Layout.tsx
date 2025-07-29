@@ -22,7 +22,7 @@ import {
 
 export type LayoutProps<Scrollable extends boolean | undefined = undefined> = {
   skeleton?: { colors?: SkeletonLoadingIndicatorProps['colors'] } | boolean;
-  loading?: Omit<LoadingIndicatorProps, 'width'> | boolean;
+  loading?: LoadingIndicatorProps | boolean;
   scrollable?: Scrollable;
   wrap?: boolean;
   /**
