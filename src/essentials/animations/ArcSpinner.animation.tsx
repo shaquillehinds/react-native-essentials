@@ -9,7 +9,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
 
-export type LoadingSpinnerProps = {
+export type ArcSpinnerAnimationProps = {
   size?: number;
   color?: string;
   strokeWidth?: number;
@@ -19,7 +19,7 @@ export function ArcSpinnerAnimation({
   size = 24,
   color = '#999',
   strokeWidth = 3,
-}: LoadingSpinnerProps) {
+}: ArcSpinnerAnimationProps) {
   const rotation = useSharedValue(0);
 
   useEffect(() => {
