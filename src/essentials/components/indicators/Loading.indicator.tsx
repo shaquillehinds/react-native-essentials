@@ -8,6 +8,7 @@ export type LoadingIndicatorProps = {
   opacity?: number;
   backgroundColor?: string;
   animationColor?: string;
+  absolute?: boolean;
 };
 
 export function LoadingIndicator({
@@ -16,6 +17,7 @@ export function LoadingIndicator({
   backgroundColor,
   animationColor,
   opacity,
+  absolute,
 }: LoadingIndicatorProps) {
   const containerStyle: StyleProp<ViewStyle> = {
     width: '100%',
@@ -28,6 +30,7 @@ export function LoadingIndicator({
   };
   return (
     <ViewDimensionsInjector
+      absolute={absolute}
       renderItem={(d) => (
         <View style={containerStyle}>
           {TopComponent}

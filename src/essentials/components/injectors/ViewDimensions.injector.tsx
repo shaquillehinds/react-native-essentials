@@ -8,6 +8,7 @@ import {
 import { useViewDimensions } from '../../hooks/useViewDimensions';
 
 export type ViewDimensionsInjectorProps = {
+  absolute?: boolean;
   justifyContent?: FlexStyle['justifyContent'];
   aligntItems?: FlexStyle['alignItems'];
   renderItem: (dimensions: LayoutRectangle) => React.ReactNode;
@@ -21,6 +22,7 @@ export function ViewDimensionsInjector(props: ViewDimensionsInjectorProps) {
     justifyContent: props.justifyContent || 'center',
     alignItems: props.aligntItems || 'center',
   };
+  if (props.absolute) containerStyle.position = 'absolute';
   return (
     <View collapsable={false} style={containerStyle} onLayout={onLayout}>
       {viewDimensions ? props.renderItem(viewDimensions) : null}
