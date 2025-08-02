@@ -94,7 +94,11 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
   };
   if (loading)
     return (
-      <LoadingIndicator {...(typeof loading === 'boolean' ? {} : loading)} />
+      <LoadingIndicator
+        {...(typeof loading === 'boolean'
+          ? { backgroundColor }
+          : { backgroundColor, ...loading })}
+      />
     );
   if (skeleton)
     return (

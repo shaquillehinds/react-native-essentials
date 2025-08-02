@@ -5,13 +5,17 @@ import { ArcSpinnerAnimation } from '../../animations/ArcSpinner.animation';
 export type LoadingIndicatorProps = {
   TopComponent?: React.JSX.Element;
   BottomComponent?: React.JSX.Element;
-  color?: `#${string}`;
+  opacity?: number;
+  backgroundColor?: string;
+  animationColor?: string;
 };
 
 export function LoadingIndicator({
   TopComponent,
   BottomComponent,
-  color,
+  backgroundColor,
+  animationColor,
+  opacity,
 }: LoadingIndicatorProps) {
   const containerStyle: StyleProp<ViewStyle> = {
     width: '100%',
@@ -19,13 +23,15 @@ export function LoadingIndicator({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'visible',
+    backgroundColor: backgroundColor,
+    opacity,
   };
   return (
     <ViewDimensionsInjector
       renderItem={(d) => (
         <View style={containerStyle}>
           {TopComponent}
-          <ArcSpinnerAnimation size={d.width / 2} color={color} />
+          <ArcSpinnerAnimation size={d.width / 2.5} color={animationColor} />
           {BottomComponent}
         </View>
       )}
