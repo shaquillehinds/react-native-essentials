@@ -34,7 +34,7 @@ export function LoadingIndicator({
       renderItem={(d) => (
         <View style={containerStyle}>
           {TopComponent}
-          <ArcSpinnerAnimation size={d.width / 2.5} color={animationColor} />
+          <ArcSpinnerAnimation size={d.width / 4} color={animationColor} />
           {BottomComponent}
         </View>
       )}
