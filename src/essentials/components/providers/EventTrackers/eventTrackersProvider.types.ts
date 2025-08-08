@@ -24,14 +24,16 @@ export type EventTracker = {
 export type EventTrackersRecord = Record<string, EventTracker>;
 export interface TrackerEventsContextValue {
   events: EventTracker[];
-  markEventsAsSeen: () => void;
   seen: SeenEventsRecord;
 }
 export interface EventTrackersContextValue {
+  deleteEvent: (e: EventTracker) => void;
+  clearEvents: () => void;
   addEventTracker: (
     event: Omit<EventTracker, 'updatedAt' | 'createdAt'>
   ) => void;
   removeEventTracker: (eventId: string) => void;
+  markEventsAsSeen: () => void;
 }
 export type EventTrackersProviderProps = {
   children: ReactNode;

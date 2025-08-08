@@ -78,6 +78,20 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
     deleteUnSeenAndSeen(e.id);
   }, []);
 
+  const clearEvents = useCallback(() => {
+    storedEvents.current = {};
+    seenEvents.current = {};
+    unSeenEvents.current = {};
+    eventsStorage.remove();
+    seenEventsStorage.remove();
+    unSeenEventsStorage.remove();
+    setEvents([]);
+    for (const tracker in inProgressTrackers.current) {
+      inProgressTrackers.current[tracker]?.stop();
+    }
+    inProgressTrackers.current = {};
+  }, []);
+
   const initalizeTracker = useCallback((eventTracker: EventTracker) => {
     if (eventTracker.status === 'in_progress') {
       inProgressTrackers.current[eventTracker.id] = new Scheduler.Schedule(
@@ -105,7 +119,7 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
               storeEvent(update, true);
             }
           } catch (error) {
-            console.error($lf(108), error);
+            console.error($lf(122), error);
           }
           if (
             storedEvents.current[currentEvent.id]?.status === 'in_progress' &&
@@ -153,16 +167,13 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
       }
     }, []);
 
-  const value = useMemo(() => ({ addEventTracker, removeEventTracker }), []);
+  //prettier-ignore
+  const value = useMemo(() => ({
+    addEventTracker, removeEventTracker, clearEvents, deleteEvent, markEventsAsSeen: markUnSeenAsSeen 
+  }), []);
 
   return (
-    <TrackerEventsContext.Provider
-      value={{
-        events,
-        markEventsAsSeen: markUnSeenAsSeen,
-        seen: seenEvents.current,
-      }}
-    >
+    <TrackerEventsContext.Provider value={{ events, seen: seenEvents.current }}>
       <EventTrackersContext.Provider value={value}>
         {props.children}
       </EventTrackersContext.Provider>
