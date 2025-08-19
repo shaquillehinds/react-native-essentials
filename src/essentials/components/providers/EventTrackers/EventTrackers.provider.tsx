@@ -129,9 +129,11 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
             inProgressTrackers.current[currentEvent.id]?.stop();
             currentEvent.status = 'failed';
             storeEvent(currentEvent, true);
+            eventTracker.onMaxTimeInProgress?.(eventTracker);
             return;
           }
           if (currentEvent.expires && Date.now() > currentEvent.expires) {
+            eventTracker.onExpire?.(eventTracker);
             return deleteEvent(eventTracker);
           }
         },

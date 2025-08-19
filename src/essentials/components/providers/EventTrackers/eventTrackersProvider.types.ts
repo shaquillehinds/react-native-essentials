@@ -20,6 +20,8 @@ export type EventData = {
 };
 export type EventTracker = {
   statusCheckFnId: string;
+  onExpire?: (eventData: EventData) => void;
+  onMaxTimeInProgress?: (eventData: EventData) => void;
 } & EventData;
 export type EventTrackersRecord = Record<string, EventTracker>;
 export interface TrackerEventsContextValue {
