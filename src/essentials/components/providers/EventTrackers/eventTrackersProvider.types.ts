@@ -19,7 +19,7 @@ export type EventData = {
   expires?: number;
   statusCheckInterval?: number;
   maxTimeInProgress?: number;
-  statusFnAlternateTrigger?: 'expired' | 'maxTimeInProgress';
+  statusCheckFnAlternateTrigger?: 'expired' | 'maxTimeInProgress';
 };
 export type EventTracker = {
   statusCheckFnId: string;
