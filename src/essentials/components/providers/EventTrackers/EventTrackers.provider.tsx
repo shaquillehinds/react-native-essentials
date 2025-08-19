@@ -104,7 +104,7 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
           try {
             const checkStatusFn =
               props.statusCheckFnRegistry[currentEvent.statusCheckFnId];
-            if (!checkStatusFn) {
+            if (!checkStatusFn || !currentEvent.statusFnAlternateTrigger) {
               deleteEvent(eventTracker);
               throw Error(
                 'Check status function not found, please make sure the id of the event matches an id in theregistry.'
@@ -122,6 +122,9 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
           } catch (error) {
             console.error(error);
           }
+          const checkStatusFn =
+            props.statusCheckFnRegistry[currentEvent.statusCheckFnId];
+
           if (
             storedEvents.current[currentEvent.id]?.status === 'in_progress' &&
             currentEvent.maxTimeInProgress &&
@@ -130,18 +133,32 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
             inProgressTrackers.current[currentEvent.id]?.stop();
             currentEvent.status = 'failed';
             storeEvent(currentEvent, true);
-            try {
-              eventTracker.onMaxTimeInProgress?.(eventTracker);
-            } catch (error) {
-              console.error(error);
+            if (
+              eventTracker.statusFnAlternateTrigger === 'maxTimeInProgress' &&
+              checkStatusFn
+            ) {
+              try {
+                await checkStatusFn({
+                  ...currentEvent,
+                });
+              } catch (error) {
+                console.error(error);
+              }
             }
             return;
           }
           if (currentEvent.expires && Date.now() > currentEvent.expires) {
-            try {
-              eventTracker.onExpire?.(eventTracker);
-            } catch (error) {
-              console.error(error);
+            if (
+              eventTracker.statusFnAlternateTrigger === 'expired' &&
+              checkStatusFn
+            ) {
+              try {
+                await checkStatusFn({
+                  ...currentEvent,
+                });
+              } catch (error) {
+                console.error(error);
+              }
             }
             return deleteEvent(eventTracker);
           }

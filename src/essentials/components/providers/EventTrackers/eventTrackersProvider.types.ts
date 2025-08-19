@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
 
 export type EvenStatus = 'in_progress' | 'done' | 'failed' | 'cancelled';
-export type StatusCheckFn = (props: EventTracker) => Promise<EventTracker>;
+export type StatusCheckFn = (
+  eventTracker: EventTracker
+) => Promise<EventTracker>;
 export type EventData = {
   id: string;
   name: string;
@@ -17,11 +19,10 @@ export type EventData = {
   expires?: number;
   statusCheckInterval?: number;
   maxTimeInProgress?: number;
+  statusFnAlternateTrigger?: 'expired' | 'maxTimeInProgress';
 };
 export type EventTracker = {
   statusCheckFnId: string;
-  onExpire?: (eventData: EventData) => void;
-  onMaxTimeInProgress?: (eventData: EventData) => void;
 } & EventData;
 export type EventTrackersRecord = Record<string, EventTracker>;
 export interface TrackerEventsContextValue {
