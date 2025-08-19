@@ -1,3 +1,4 @@
+//$lf-ignore
 //prettier-ignore
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import { createStorageAccessors } from '../../../utils/createMMKVStorageAccessors';
@@ -119,7 +120,7 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
               storeEvent(update, true);
             }
           } catch (error) {
-            console.error($lf(122), error);
+            console.error(error);
           }
           if (
             storedEvents.current[currentEvent.id]?.status === 'in_progress' &&
@@ -132,7 +133,7 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
             try {
               eventTracker.onMaxTimeInProgress?.(eventTracker);
             } catch (error) {
-              console.error($lf(135), error);
+              console.error(error);
             }
             return;
           }
@@ -140,7 +141,7 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
             try {
               eventTracker.onExpire?.(eventTracker);
             } catch (error) {
-              console.error($lf(143), error);
+              console.error(error);
             }
             return deleteEvent(eventTracker);
           }
@@ -206,8 +207,3 @@ export const useTrackerEvents = () => {
   }
   return context;
 };
-
-function $lf(n: number) {
-  return '$lf|providers/EventTrackers/EventTrackers.provider.tsx:' + n + ' >';
-  // Automatically injected by Log Location Injector vscode extension
-}
