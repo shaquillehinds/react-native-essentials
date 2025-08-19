@@ -1,8 +1,10 @@
 import type { ReactNode } from 'react';
 
+export type StatusCheckFnTriggerType = 'expired' | 'maxTimeInProgress';
 export type EvenStatus = 'in_progress' | 'done' | 'failed' | 'cancelled';
 export type StatusCheckFn = (
-  eventTracker: EventTracker
+  eventTracker: EventTracker,
+  triggerType?: StatusCheckFnTriggerType
 ) => Promise<EventTracker>;
 export type EventData = {
   id: string;
@@ -19,7 +21,7 @@ export type EventData = {
   expires?: number;
   statusCheckInterval?: number;
   maxTimeInProgress?: number;
-  statusCheckFnAlternateTrigger?: 'expired' | 'maxTimeInProgress';
+  triggerStatusCheckFnOn?: StatusCheckFnTriggerType[];
 };
 export type EventTracker = {
   statusCheckFnId: string;

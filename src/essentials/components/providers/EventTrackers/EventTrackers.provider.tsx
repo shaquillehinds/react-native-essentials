@@ -104,7 +104,7 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
           try {
             const checkStatusFn =
               props.statusCheckFnRegistry[currentEvent.statusCheckFnId];
-            if (!checkStatusFn || !currentEvent.statusCheckFnAlternateTrigger) {
+            if (!checkStatusFn) {
               deleteEvent(eventTracker);
               throw Error(
                 'Check status function not found, please make sure the id of the event matches an id in theregistry.'
@@ -134,14 +134,13 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
             currentEvent.status = 'failed';
             storeEvent(currentEvent, true);
             if (
-              eventTracker.statusCheckFnAlternateTrigger ===
-                'maxTimeInProgress' &&
+              eventTracker.triggerStatusCheckFnOn?.includes(
+                'maxTimeInProgress'
+              ) &&
               checkStatusFn
             ) {
               try {
-                await checkStatusFn({
-                  ...currentEvent,
-                });
+                await checkStatusFn({ ...currentEvent }, 'maxTimeInProgress');
               } catch (error) {
                 console.error(error);
               }
@@ -150,13 +149,11 @@ export const EventTrackerProvider = (props: EventTrackersProviderProps) => {
           }
           if (currentEvent.expires && Date.now() > currentEvent.expires) {
             if (
-              eventTracker.statusCheckFnAlternateTrigger === 'expired' &&
+              eventTracker.triggerStatusCheckFnOn?.includes('expired') &&
               checkStatusFn
             ) {
               try {
-                await checkStatusFn({
-                  ...currentEvent,
-                });
+                await checkStatusFn({ ...currentEvent }, 'expired');
               } catch (error) {
                 console.error(error);
               }
