@@ -7,7 +7,7 @@ import Animated, {
   withRepeat,
   withTiming,
 } from 'react-native-reanimated';
-import ArCircle from '../svgs/ArcCircle';
+import ArcCircle from '../svgs/ArcCircle';
 
 export type ArcSpinnerAnimationProps = {
   size?: number;
@@ -39,7 +39,7 @@ export function ArcSpinnerAnimation({
 
   return (
     <Animated.View style={[{ width: size, height: size }, animatedStyle]}>
-      <ArCircle color={color} size={size} />
+      <ArcCircle color={color} size={size} />
     </Animated.View>
   );
 }

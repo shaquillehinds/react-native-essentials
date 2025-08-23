@@ -1,7 +1,7 @@
 import Svg, { Path } from 'react-native-svg';
 import { normalize } from '../utils';
 
-export default function ArCircle({
+export default function ArcCircle({
   size,
   color,
 }: {
