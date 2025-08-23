@@ -7,6 +7,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import {
   snapShotGestureResponderEvent,
+  wait,
   type GestureResponderNativeEventSnapshot,
 } from '../../utils';
 
@@ -44,6 +45,7 @@ export function Press({
   ...props
 }: PressProps) {
   const activateRef = useRef(false);
+  const moveCancelledRef = useRef(false);
 
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
@@ -101,27 +103,39 @@ export function Press({
           onLongPress?.(snapshot);
         }, longPressDuration || 800);
       }}
-      onTouchEnd={(e) => {
+      onTouchEnd={async (e) => {
         stopPropagation && e.stopPropagation();
         preventDefault && e.preventDefault();
         persist && e.persist();
-        if (!activateRef.current) return;
-        activationDelay
-          ? setTimeout(() => onPress?.(e), activationDelay)
-          : onPress?.(e);
+        if (!activateRef.current) {
+          moveCancelledRef.current = false;
+          return;
+        }
+        await wait(activationDelay || 50);
+        if (moveCancelledRef.current) {
+          moveCancelledRef.current = false;
+          return;
+        }
+        onPress?.(e);
         prevActivatedTime.current = Date.now();
       }}
       onTouchEndCapture={resetPress}
       onTouchCancel={resetPress}
       onTouchMove={(e) => {
-        if (!activateRef.current) return;
+        if (!activateRef.current) {
+          moveCancelledRef.current = false;
+          return;
+        }
         const maxDistance = 10;
         const isDisabled =
           Math.abs(e.nativeEvent.pageX - touchStartPosition.current.x) >
             maxDistance ||
           Math.abs(e.nativeEvent.pageY - touchStartPosition.current.y) >
             maxDistance;
-        if (isDisabled) resetPress();
+        if (isDisabled) {
+          moveCancelledRef.current = true;
+          resetPress();
+        }
       }}
     />
   );
