@@ -7,18 +7,16 @@ import Animated, {
   withRepeat,
   withTiming,
 } from 'react-native-reanimated';
-import Svg, { Circle } from 'react-native-svg';
+import ArCircle from '../svgs/ArcCircle';
 
 export type ArcSpinnerAnimationProps = {
   size?: number;
   color?: string;
-  strokeWidth?: number;
 };
 
 export function ArcSpinnerAnimation({
   size = 24,
   color = '#999',
-  strokeWidth = 3,
 }: ArcSpinnerAnimationProps) {
   const rotation = useSharedValue(0);
 
@@ -39,23 +37,9 @@ export function ArcSpinnerAnimation({
     transform: [{ rotate: `${rotation.value}deg` }],
   }));
 
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-
   return (
     <Animated.View style={[{ width: size, height: size }, animatedStyle]}>
-      <Svg width={size} height={size}>
-        <Circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke={color}
-          strokeWidth={strokeWidth}
-          strokeLinecap="round"
-          strokeDasharray={`${circumference * 0.75}, ${circumference}`}
-          fill="none"
-        />
-      </Svg>
+      <ArCircle color={color} size={size} />
     </Animated.View>
   );
 }
