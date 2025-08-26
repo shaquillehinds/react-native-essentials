@@ -39,14 +39,28 @@ export type LayoutProps<Scrollable extends boolean | undefined = undefined> = {
   centerX?: boolean;
   absolute?: boolean;
   alignSelf?: FlexAlignType;
+  spaceEnd?: boolean;
+  spaceStart?: boolean;
   spaceEven?: boolean;
+  spaceCenter?: boolean;
   spaceBetween?: boolean;
   flexDirection?: FlexStyle['flexDirection'];
   backgroundColor?: string;
+  top?: DimensionValue;
+  bottom?: DimensionValue;
+  left?: DimensionValue;
+  right?: DimensionValue;
 } & Spacing &
   (Scrollable extends true ? ScrollViewProps : ViewProps);
 
 export function Layout<Scrollable extends boolean | undefined = undefined>({
+  top,
+  bottom,
+  left,
+  right,
+  spaceCenter,
+  spaceEnd,
+  spaceStart,
   center,
   centerX,
   wrap,
@@ -73,11 +87,15 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
     ...transformSpacing({ margin, orientation }),
     width: typeof width === 'number' ? orientation.relativeX(width) : width,
     height: typeof height === 'number' ? orientation.relativeY(height) : height,
-    alignSelf: alignSelf,
+    alignSelf,
     position: absolute ? 'absolute' : undefined,
     flex: flex?.[0],
     flexShrink: flex?.[1],
     flexBasis: flex?.[2],
+    top,
+    bottom,
+    left,
+    right,
   };
   const contentStyle: ViewStyle = {
     ...transformSpacing({ padding, orientation }),
@@ -89,9 +107,13 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
       ? 'space-evenly'
       : spaceBetween
         ? 'space-between'
-        : centerX
+        : centerX || spaceCenter
           ? 'center'
-          : undefined,
+          : spaceStart
+            ? 'flex-start'
+            : spaceEnd
+              ? 'flex-end'
+              : undefined,
   };
   if (loading)
     return (
