@@ -12,13 +12,13 @@ import {
 } from 'react-native';
 import type { Spacing } from '../../styles/Spacer/Spacer.types';
 import { transformSpacing } from '../../styles/Spacer/Spacer.style';
-import { relativeX, relativeY } from '../../utils/layout';
 import {
   LoadingIndicator,
   SkeletonViewIndicator,
   type LoadingIndicatorProps,
   type SkeletonLoadingIndicatorProps,
 } from '../indicators';
+import { useDeviceOrientation } from '../../hooks';
 
 export type LayoutProps<Scrollable extends boolean | undefined = undefined> = {
   skeleton?: { colors?: SkeletonLoadingIndicatorProps['colors'] } | boolean;
@@ -68,10 +68,11 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
   style,
   ...props
 }: PropsWithChildren<LayoutProps<Scrollable>>) {
+  const orientation = useDeviceOrientation();
   const viewStyle: ViewStyle = {
-    ...transformSpacing({ margin: margin }),
-    width: typeof width === 'number' ? relativeX(width) : width,
-    height: typeof height === 'number' ? relativeY(height) : height,
+    ...transformSpacing({ margin, orientation }),
+    width: typeof width === 'number' ? orientation.relativeX(width) : width,
+    height: typeof height === 'number' ? orientation.relativeY(height) : height,
     alignSelf: alignSelf,
     position: absolute ? 'absolute' : undefined,
     flex: flex?.[0],
@@ -79,7 +80,7 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
     flexBasis: flex?.[2],
   };
   const contentStyle: ViewStyle = {
-    ...transformSpacing({ padding: padding }),
+    ...transformSpacing({ padding, orientation }),
     alignItems: center ? 'center' : undefined,
     flexDirection: flexDirection,
     backgroundColor: backgroundColor,

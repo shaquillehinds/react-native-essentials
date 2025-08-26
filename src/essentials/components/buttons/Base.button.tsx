@@ -12,11 +12,13 @@ import {
 import { BaseText } from '../typography';
 import { Press } from '../wrappers';
 import type { ButtonProps } from './Button.types';
+import { useDeviceOrientation } from '../../hooks';
 
 export function BaseButton(props: PropsWithChildren<ButtonProps>) {
+  const orientation = useDeviceOrientation();
   const sizes = buttonSizes[props.buttonSize || 'medium'];
   const configuredStyles: ViewStyle = {
-    ...transformSpacing({ padding: props.padding }),
+    ...transformSpacing({ padding: props.padding, orientation }),
     borderWidth: borderSizes[props.borderWidth || 'thin'],
     borderColor: props.borderColor || 'transparent',
     paddingHorizontal: sizes.paddingHorizontal,
@@ -50,7 +52,7 @@ export function BaseButton(props: PropsWithChildren<ButtonProps>) {
     <Press
       activeOpacity={props.disabled ? 0.5 : props.activeOpacity || 0.8}
       style={{
-        ...transformSpacing({ margin: props.margin }),
+        ...transformSpacing({ margin: props.margin, orientation }),
         width: configuredStyles.width,
         alignSelf: configuredStyles.alignSelf || 'center',
       }}

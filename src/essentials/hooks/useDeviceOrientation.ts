@@ -68,3 +68,7 @@ export const useDeviceOrientation = () => {
     },
   };
 };
+
+export type UseDeviceOrientationReturnType = ReturnType<
+  typeof useDeviceOrientation
+>;
