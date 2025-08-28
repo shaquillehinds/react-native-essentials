@@ -1,3 +1,3 @@
 export * from './drag.animation';
 export * from './ArcSpinner.animation';
-export * from './AnimatedComponent';
+export * from './AnimateComponent';
