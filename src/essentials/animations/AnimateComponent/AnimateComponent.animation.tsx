@@ -1,4 +1,3 @@
-import AnimatedValueComponent from './AnimateValueComponent.animation';
 import type {
   AnimateComponentProps,
   AnimateComponentRef,
@@ -6,9 +5,10 @@ import type {
   XYNumber,
 } from './AnimateComponent.types';
 import { Animated, type ViewStyle } from 'react-native';
-import AnimateXYValueComponent from './AnimateXYValueComponent.animation';
+import { AnimateXYValueComponent } from './AnimateXYValueComponent.animation';
+import { AnimateValueComponent } from './AnimateValueComponent.animation';
 
-export default function AnimateComponent<T extends InitialValue>(
+export function AnimateComponent<T extends InitialValue>(
   props: AnimateComponentProps<T>
 ) {
   if (
@@ -16,7 +16,7 @@ export default function AnimateComponent<T extends InitialValue>(
     props.initialPosition instanceof Animated.Value
   )
     return (
-      <AnimatedValueComponent
+      <AnimateValueComponent
         {...props}
         initialPosition={props.initialPosition as number}
         style={props.style as (value: Animated.Value) => ViewStyle}

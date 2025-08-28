@@ -5,9 +5,7 @@ import type {
   AnimateComponentProps,
 } from './AnimateComponent.types';
 
-export default function AnimateValueComponent(
-  props: AnimateComponentProps<number>
-) {
+export function AnimateValueComponent(props: AnimateComponentProps<number>) {
   const compositionRef = useRef<Animated.CompositeAnimation | null>(null);
   const animatedValue = useAnimatedValue(props.initialPosition, {
     useNativeDriver: true,
