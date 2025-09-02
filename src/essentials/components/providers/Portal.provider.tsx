@@ -103,7 +103,7 @@ export const PortalProvider = ({
     []
   );
 
-  const Context = CustomPortalContext || PortalContext;
+  const Context = useMemo(() => CustomPortalContext || PortalContext, []);
 
   const value = useMemo(() => ({ mount, update, unmount }), []);
 
