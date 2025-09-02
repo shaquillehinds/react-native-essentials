@@ -36,6 +36,7 @@ export const PortalProvider = ({
   children,
   unMountBufferTimeMS,
   updateBufferTimeMS,
+  CustomPortalContext,
 }: {
   children: ReactNode;
   /**
@@ -48,6 +49,7 @@ export const PortalProvider = ({
    * How much time to wait until portal update can be called again. Usually won't be necessary since update shouldn't cause rerenders but useful for stopping infinite portal update feedback loops if they do occur.
    */
   updateBufferTimeMS?: number;
+  CustomPortalContext?: typeof PortalContext;
 }) => {
   const portalItemsAmount = useRef(0);
   const keys = useRef<Record<string, PortalItemStatusTime>>({});
@@ -101,22 +103,24 @@ export const PortalProvider = ({
     []
   );
 
+  const Context = CustomPortalContext || PortalContext;
+
   const value = useMemo(() => ({ mount, update, unmount }), []);
 
   return (
-    <PortalContext.Provider value={value}>
+    <Context.Provider value={value}>
       {children}
       <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
         {portals.map(({ key, element }) => (
           <React.Fragment key={key}>{element}</React.Fragment>
         ))}
       </View>
-    </PortalContext.Provider>
+    </Context.Provider>
   );
 };
 
-export const usePortal = () => {
-  const context = useContext(PortalContext);
+export const usePortal = (CustomPortalContext?: typeof PortalContext) => {
+  const context = useContext(CustomPortalContext || PortalContext);
   if (!context) {
     return null;
   }
@@ -126,11 +130,12 @@ export const usePortal = () => {
 export type UsePortalComponentProps = {
   name: string;
   Component: ReactNode;
+  CustomPortalContext?: typeof PortalContext;
   disable?: boolean;
 };
 export const usePortalComponent = (props: UsePortalComponentProps) => {
   const portalId = useRef('');
-  const portal = usePortal();
+  const portal = usePortal(props.CustomPortalContext);
   useEffect(() => {
     if (!props.disable) {
       if (portalId.current) {
