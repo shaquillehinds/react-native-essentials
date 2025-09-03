@@ -106,7 +106,7 @@ export function Press({
       onTouchEnd={async (e) => {
         stopPropagation && e.stopPropagation();
         preventDefault && e.preventDefault();
-        persist && e.persist();
+        e.persist();
         if (!activateRef.current) {
           moveCancelledRef.current = false;
           return;
