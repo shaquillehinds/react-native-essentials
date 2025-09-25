@@ -22,7 +22,7 @@ export type AnimateComponentRef<T extends InitialValue> = {
 };
 export type AnimateComponentProps<T extends InitialValue> =
   React.PropsWithChildren<{
-    ref?: React.RefObject<AnimateComponentRef<T>>;
+    ref?: React.RefObject<AnimateComponentRef<T> | null>;
     initialPosition: T;
     toPosition:
       | AnimateComponentAnimationConfig[]

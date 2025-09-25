@@ -25,6 +25,7 @@ export function AnimateValueComponent(props: AnimateComponentProps<number>) {
         ]);
       if (props.loop)
         composition = Animated.loop(composition, { iterations: props.loop });
+      compositionRef.current = composition;
       if (props.autoStart) composition.start();
     } else {
       const length = props.toPosition.length;
@@ -60,7 +61,7 @@ export function AnimateValueComponent(props: AnimateComponentProps<number>) {
         if (props.autoStart) composition.start();
       }
     }
-  }, []);
+  }, [props]);
 
   useImperativeHandle(props.ref, () => ({
     stop: () => compositionRef.current?.stop(),
