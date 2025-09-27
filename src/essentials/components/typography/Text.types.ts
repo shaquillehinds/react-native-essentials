@@ -8,6 +8,7 @@ import { type AnimatedStyle } from 'react-native-reanimated';
 import type { Spacing } from '../../styles';
 
 export interface BaseTextProps extends Spacing, TextProps {
+  translate?: boolean;
   fontSize?: FontSize;
   customColor?: string;
   fontStyle?: FontStyle;

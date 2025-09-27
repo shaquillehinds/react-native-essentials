@@ -4,6 +4,7 @@ import type { BaseTextProps, LetterSpacing, LineHeight } from './Text.types';
 import type { PropsWithChildren } from 'react';
 import { fontSizes } from '../../utils/sizeCalculations';
 import Animated from 'react-native-reanimated';
+import { TranslateText } from './Translate.text';
 
 const spacings: { [key in LetterSpacing]: number } = {
   wide: 0.7,
@@ -29,6 +30,7 @@ export function BaseText({
   animate,
   center,
   onPress,
+  translate,
   ...rest
 }: PropsWithChildren<BaseTextProps>) {
   const TextComponent = animate
@@ -53,7 +55,7 @@ export function BaseText({
       style={[styles, animatedStyle, style]}
       {...rest}
     >
-      {children}
+      {translate ? <TranslateText>{children}</TranslateText> : children}
     </TextComponent>
   );
 }

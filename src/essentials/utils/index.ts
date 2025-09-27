@@ -7,3 +7,6 @@ export * from './layout';
 export * from './sizeCalculations';
 export * from './snapshots/snapShotGestureResponderEvent';
 export * from './createMMKVStorageAccessors';
+export * from './LanguageCodes';
+export * from './mergeStringRecords';
+export * from './mergeLanguagesRecords';
