@@ -52,54 +52,59 @@ export function LocalizationProvider(props: LocalizationProviderProps) {
   );
 
   useEffect(() => {
-    if (props.initialLanguagesRecord)
-      languagesRef.current = props.initialLanguagesRecord;
-    const storedRecords = localizationStorage.retrieve();
-    if (!storedRecords) localizationStorage.store(languagesRef.current);
-    else
-      languagesRef.current = mergeLanguagesRecords({
-        obj1: languagesRef.current,
-        obj2: storedRecords,
-      });
-    if (!storedRecords?.[props.targetLanguage]) {
-      props
-        .initialLanguagesRecordRetriever?.({
-          sourceLanguage: props.sourceLanguage,
-          targetLanguage: props.targetLanguage,
-        })
-        .then((res) => {
-          if (Array.isArray(res)) {
-            languagesRef.current = mergeLanguagesRecords({
-              obj1: languagesRef.current,
-              obj2: res.reduce((prev, curr) => {
-                if (prev[props.targetLanguage])
-                  prev[props.targetLanguage]![sha256(curr.original, 'base64')] =
-                    curr.translated;
-                else {
-                  prev[props.targetLanguage] = {
-                    [sha256(curr.original, 'base64')]: curr.translated,
-                  };
-                }
-                return prev;
-              }, {} as LanguagesRecord),
-            });
-          }
-        })
-        .catch((e) => console.error($lf(88), e))
-        .finally(() => {
-          if (languagesRef.current[props.targetLanguage])
-            localizationStorage.store(languagesRef.current);
-          else
-            localizationStorage.store({
-              ...languagesRef.current,
-              [props.targetLanguage]: {},
-            });
+    if (props.sourceLanguage.slice(0, 2) !== props.targetLanguage.slice(0, 2)) {
+      if (props.initialLanguagesRecord)
+        languagesRef.current = props.initialLanguagesRecord;
+      const storedRecords = localizationStorage.retrieve();
+      if (!storedRecords) localizationStorage.store(languagesRef.current);
+      else
+        languagesRef.current = mergeLanguagesRecords({
+          obj1: languagesRef.current,
+          obj2: storedRecords,
         });
+      if (!storedRecords?.[props.targetLanguage]) {
+        props
+          .initialLanguagesRecordRetriever?.({
+            sourceLanguage: props.sourceLanguage,
+            targetLanguage: props.targetLanguage,
+          })
+          .then((res) => {
+            if (Array.isArray(res)) {
+              languagesRef.current = mergeLanguagesRecords({
+                obj1: languagesRef.current,
+                obj2: res.reduce((prev, curr) => {
+                  if (prev[props.targetLanguage])
+                    prev[props.targetLanguage]![
+                      sha256(curr.original, 'base64')
+                    ] = curr.translated;
+                  else {
+                    prev[props.targetLanguage] = {
+                      [sha256(curr.original, 'base64')]: curr.translated,
+                    };
+                  }
+                  return prev;
+                }, {} as LanguagesRecord),
+              });
+            }
+          })
+          .catch((e) => console.error($lf(89), e))
+          .finally(() => {
+            if (languagesRef.current[props.targetLanguage])
+              localizationStorage.store(languagesRef.current);
+            else
+              localizationStorage.store({
+                ...languagesRef.current,
+                [props.targetLanguage]: {},
+              });
+          });
+      }
     }
   }, [props.sourceLanguage, props.targetLanguage]);
 
   const translate = useCallback(
     async (text: string) => {
+      if (props.sourceLanguage.slice(0, 2) === props.targetLanguage.slice(0, 2))
+        return text;
       const trimmed = text.trim();
       const hashed = sha256(trimmed, 'base64');
       if (!languagesRef.current[props.targetLanguage])
@@ -128,7 +133,7 @@ export function LocalizationProvider(props: LocalizationProviderProps) {
         localizationStorage.store(languagesRef.current);
         return result;
       } catch (error) {
-        console.error($lf(131), error);
+        console.error($lf(133), error);
         return trimmed;
       }
     },
