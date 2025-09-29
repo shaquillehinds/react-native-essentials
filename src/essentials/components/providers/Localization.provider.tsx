@@ -13,6 +13,7 @@ import {
   type LanguagesRecord,
 } from '../../utils/mergeLanguagesRecords';
 import type { LanguageCode } from '../../utils/LanguageCodes';
+import { sha256 } from '../../utils/hashes/sha256';
 
 export type LocalizationContextValue = {
   translate: (text: string) => Promise<string>;
@@ -55,24 +56,33 @@ export function LocalizationProvider(props: LocalizationProviderProps) {
   const translate = useCallback(
     async (text: string) => {
       const trimmed = text.trim();
+      const hashed = sha256(trimmed, 'base64');
       if (!languagesRef.current[props.targetLanguage])
         languagesRef.current[props.targetLanguage] = {};
-      let translated = languagesRef.current[props.targetLanguage]![trimmed];
-      if (translated) return translated;
+      let translated = languagesRef.current[props.targetLanguage]![hashed];
+      if (translated) {
+        if (typeof translated !== 'string') {
+          delete languagesRef.current[props.targetLanguage]![hashed];
+          localizationStorage.store(languagesRef.current);
+        }
+        return translated;
+      }
       try {
-        if (translatingRef.current[trimmed])
-          return await translatingRef.current[trimmed];
-        translatingRef.current[trimmed] = props.translation({
+        if (translatingRef.current[hashed])
+          return await translatingRef.current[hashed];
+        translatingRef.current[hashed] = props.translation({
           sourceLanguage: props.sourceLanguage,
           targetLanguage: props.targetLanguage,
           text: trimmed,
         });
-        const result = await translatingRef.current[trimmed];
-        languagesRef.current[props.targetLanguage]![trimmed] = result;
+        const result = await translatingRef.current[hashed];
+        if (typeof result !== 'string')
+          throw new Error('Invalid translation, not a string');
+        languagesRef.current[props.targetLanguage]![hashed] = result;
         localizationStorage.store(languagesRef.current);
         return result;
       } catch (error) {
-        console.error($lf(74), error);
+        console.error($lf(85), error);
         return trimmed;
       }
     },
