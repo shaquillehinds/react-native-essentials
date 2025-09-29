@@ -17,6 +17,7 @@ import { sha256 } from '../../utils/hashes/sha256';
 
 export type LocalizationContextValue = {
   translate: (text: string) => Promise<string>;
+  clearLocalCache: () => void;
 };
 
 //prettier-ignore
@@ -32,15 +33,24 @@ export type LocalizationProviderProps = {
     text: string;
   }) => Promise<string>;
   initialLanguagesRecord?: LanguagesRecord;
+  initialLanguagesRecordRetriever?: (props: {
+    sourceLanguage: LanguageCode;
+    targetLanguage: LanguageCode;
+  }) => Promise<{ original: string; translated: string }[]>;
 };
-
-const localizationStorage = createStorageAccessors<LanguagesRecord>(
-  'essentials-localization'
-);
 
 export function LocalizationProvider(props: LocalizationProviderProps) {
   const languagesRef = useRef<LanguagesRecord>({});
   const translatingRef = useRef<Record<string, Promise<string>>>({});
+
+  const localizationStorage = useMemo(
+    () =>
+      createStorageAccessors<LanguagesRecord>(
+        `essentials-localization-${props.sourceLanguage}`
+      ),
+    [props.sourceLanguage]
+  );
+
   useEffect(() => {
     if (props.initialLanguagesRecord)
       languagesRef.current = props.initialLanguagesRecord;
@@ -51,7 +61,42 @@ export function LocalizationProvider(props: LocalizationProviderProps) {
         obj1: languagesRef.current,
         obj2: storedRecords,
       });
-  }, []);
+    if (!storedRecords?.[props.targetLanguage]) {
+      props
+        .initialLanguagesRecordRetriever?.({
+          sourceLanguage: props.sourceLanguage,
+          targetLanguage: props.targetLanguage,
+        })
+        .then((res) => {
+          if (Array.isArray(res)) {
+            languagesRef.current = mergeLanguagesRecords({
+              obj1: languagesRef.current,
+              obj2: res.reduce((prev, curr) => {
+                if (prev[props.targetLanguage])
+                  prev[props.targetLanguage]![sha256(curr.original, 'base64')] =
+                    curr.translated;
+                else {
+                  prev[props.targetLanguage] = {
+                    [sha256(curr.original, 'base64')]: curr.translated,
+                  };
+                }
+                return prev;
+              }, {} as LanguagesRecord),
+            });
+          }
+        })
+        .catch((e) => console.error($lf(88), e))
+        .finally(() => {
+          if (languagesRef.current[props.targetLanguage])
+            localizationStorage.store(languagesRef.current);
+          else
+            localizationStorage.store({
+              ...languagesRef.current,
+              [props.targetLanguage]: {},
+            });
+        });
+    }
+  }, [props.sourceLanguage]);
 
   const translate = useCallback(
     async (text: string) => {
@@ -64,6 +109,7 @@ export function LocalizationProvider(props: LocalizationProviderProps) {
         if (typeof translated !== 'string') {
           delete languagesRef.current[props.targetLanguage]![hashed];
           localizationStorage.store(languagesRef.current);
+          return trimmed;
         }
         return translated;
       }
@@ -82,15 +128,20 @@ export function LocalizationProvider(props: LocalizationProviderProps) {
         localizationStorage.store(languagesRef.current);
         return result;
       } catch (error) {
-        console.error($lf(85), error);
+        console.error($lf(131), error);
         return trimmed;
       }
     },
     [props.translation, props.sourceLanguage, props.targetLanguage]
   );
 
+  const clearLocalCache = useCallback(() => {
+    languagesRef.current = {};
+    localizationStorage.remove();
+  }, [props.sourceLanguage]);
+
   const value = useMemo(
-    () => ({ translate }),
+    () => ({ translate, clearLocalCache }),
     [props.translation, props.sourceLanguage, props.targetLanguage]
   );
 
