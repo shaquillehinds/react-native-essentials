@@ -96,7 +96,7 @@ export function LocalizationProvider(props: LocalizationProviderProps) {
             });
         });
     }
-  }, [props.sourceLanguage]);
+  }, [props.sourceLanguage, props.targetLanguage]);
 
   const translate = useCallback(
     async (text: string) => {
