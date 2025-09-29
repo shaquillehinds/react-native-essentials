@@ -21,6 +21,7 @@ export type RadiusSize =
 export type ButtonSize = 'small' | 'large' | 'medium' | 'auto' | 'wide';
 
 export interface ButtonProps {
+  translate?: boolean;
   disabled?: boolean;
   loading?: LoadingIndicatorProps | boolean;
   borderColor?: string;

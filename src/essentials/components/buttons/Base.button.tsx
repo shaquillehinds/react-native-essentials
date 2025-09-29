@@ -71,6 +71,7 @@ export function BaseButton(props: PropsWithChildren<ButtonProps>) {
             fontSize={fontSize}
             fontStyle={props.fontStyle || 'Medium'}
             customColor={props.customFontColor}
+            translate={props.translate}
           >
             {props.children || 'Submit'}
           </BaseText>
