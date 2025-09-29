@@ -87,7 +87,7 @@ export function LocalizationProvider(props: LocalizationProviderProps) {
               });
             }
           })
-          .catch((e) => console.error($lf(89), e))
+          .catch((e) => console.error($lf(90), e))
           .finally(() => {
             if (languagesRef.current[props.targetLanguage])
               localizationStorage.store(languagesRef.current);
@@ -119,21 +119,27 @@ export function LocalizationProvider(props: LocalizationProviderProps) {
         return translated;
       }
       try {
-        if (translatingRef.current[hashed])
-          return await translatingRef.current[hashed];
+        if (translatingRef.current[hashed]) {
+          const result = await translatingRef.current[hashed];
+          delete translatingRef.current[hashed];
+          if (typeof result !== 'string')
+            throw new Error('Invalid translation, not a string');
+          return result;
+        }
         translatingRef.current[hashed] = props.translation({
           sourceLanguage: props.sourceLanguage,
           targetLanguage: props.targetLanguage,
           text: trimmed,
         });
         const result = await translatingRef.current[hashed];
+        delete translatingRef.current[hashed];
         if (typeof result !== 'string')
           throw new Error('Invalid translation, not a string');
         languagesRef.current[props.targetLanguage]![hashed] = result;
         localizationStorage.store(languagesRef.current);
         return result;
       } catch (error) {
-        console.error($lf(133), error);
+        console.error($lf(142), error);
         return trimmed;
       }
     },
