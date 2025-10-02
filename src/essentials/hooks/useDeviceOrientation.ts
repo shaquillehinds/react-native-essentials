@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Dimensions } from 'react-native';
+import { Dimensions, PixelRatio } from 'react-native';
 import {
+  isIOS,
   type DeviceOrientation as Orientation,
   type ScaledSizeDimensions,
 } from '../constants/device.const';
+import { scale } from '../utils';
 
 type DeviceOrientation = {
   screenWidth: number;
@@ -36,14 +38,16 @@ export const useDeviceOrientation = () => {
     return () => subscription.remove();
   }, []);
 
+  const relativeY = (num: number) => orientation.screenHeight * (num / 100);
+
   return {
     ...orientation,
     relativeX: (num: number) => orientation.screenWidth * (num / 100),
+    relativeY,
     relativeXWorklet: (num: number) => {
       'worklet';
       return orientation.screenWidth * (num / 100);
     },
-    relativeY: (num: number) => orientation.screenHeight * (num / 100),
     relativeYWorklet: (num: number) => {
       'worklet';
       return orientation.screenHeight * (num / 100);
@@ -65,6 +69,14 @@ export const useDeviceOrientation = () => {
         Math.max(orientation.screenWidth, orientation.screenHeight) *
         (num / 100)
       );
+    },
+    normalize: (size: number) => {
+      const newSize = relativeY(size * scale);
+      if (isIOS) {
+        return PixelRatio.roundToNearestPixel(newSize);
+      } else {
+        return Math.round(PixelRatio.roundToNearestPixel(newSize));
+      }
     },
   };
 };

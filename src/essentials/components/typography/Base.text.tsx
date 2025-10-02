@@ -2,9 +2,9 @@ import { Text, type TextStyle } from 'react-native';
 import { transformSpacing } from '../../styles';
 import type { BaseTextProps, LetterSpacing, LineHeight } from './Text.types';
 import type { PropsWithChildren } from 'react';
-import { fontSizes } from '../../utils/sizeCalculations';
 import Animated from 'react-native-reanimated';
 import { TranslateText } from './Translate.text';
+import { useFontSizes } from '../../hooks/useFontSizes';
 
 const spacings: { [key in LetterSpacing]: number } = {
   wide: 0.7,
@@ -33,6 +33,7 @@ export function BaseText({
   translate,
   ...rest
 }: PropsWithChildren<BaseTextProps>) {
+  const fontSizes = useFontSizes();
   const TextComponent = animate
     ? Animated.Text
     : (Text as typeof Animated.Text);

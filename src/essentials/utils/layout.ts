@@ -7,7 +7,7 @@ import {
 
 const diff = SCREEN_HEIGHT - WINDOW_HEIGHT;
 
-const scale = 0.11519078473722104;
+export const scale = 0.11519078473722104;
 
 export const relativeY = (num: number) =>
   (SCREEN_HEIGHT - diff / 2) * (num / 100);
