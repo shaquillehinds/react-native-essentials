@@ -6,16 +6,16 @@ import { transformSpacing } from '../../styles';
 import {
   borderSizes,
   buttonSizes,
-  fontSizes,
   radiusSizes,
 } from '../../utils/sizeCalculations';
 import { BaseText } from '../typography';
 import { Press } from '../wrappers';
 import type { ButtonProps } from './Button.types';
-import { useDeviceOrientation } from '../../hooks';
+import { useDeviceOrientation, useFontSizes } from '../../hooks';
 
 export function BaseButton(props: PropsWithChildren<ButtonProps>) {
   const orientation = useDeviceOrientation();
+  const fontSizes = useFontSizes();
   const sizes = buttonSizes[props.buttonSize || 'medium'];
   const configuredStyles: ViewStyle = {
     ...transformSpacing({ padding: props.padding, orientation }),

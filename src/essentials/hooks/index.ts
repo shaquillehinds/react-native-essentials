@@ -18,3 +18,4 @@ export {
 export { useTimer, type UseTimerProps } from './useTimer';
 export { useDeviceOrientation } from './useDeviceOrientation';
 export * from './useViewDimensions';
+export * from './useFontSizes';
