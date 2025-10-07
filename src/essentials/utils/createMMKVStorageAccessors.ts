@@ -1,6 +1,6 @@
 import { MMKV } from 'react-native-mmkv';
 
-export const storageAccessorsInstance = new MMKV();
+export const storageAccessorsInstance = new MMKV({ id: 'rne-csa' });
 
 export const createStorageAccessors = <T>(key: string) => {
   const store = (item: T) => {
