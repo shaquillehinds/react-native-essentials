@@ -6,6 +6,8 @@ import type {
 } from 'react-native';
 import { type AnimatedStyle } from 'react-native-reanimated';
 import type { Spacing } from '../../styles';
+import type { ReactNode } from 'react';
+import type { LocalizationContextValue } from '../providers';
 
 export interface BaseTextProps extends Spacing, TextProps {
   translate?: boolean;
@@ -46,3 +48,10 @@ export type FontSize =
 export type LineHeight = 'short' | 'tall';
 
 export type LetterSpacing = 'wide' | 'extraWide';
+
+export type TranslateTextProps = { children: ReactNode };
+export type LocalizationComponentProps = { text: string };
+export type TranslationComponentProps = {
+  localization: LocalizationContextValue;
+  text: string;
+};

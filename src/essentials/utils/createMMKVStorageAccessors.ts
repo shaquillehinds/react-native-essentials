@@ -1,15 +1,16 @@
 import { MMKV } from 'react-native-mmkv';
 
-const storage = new MMKV();
+export const storageAccessorsInstance = new MMKV();
 
 export const createStorageAccessors = <T>(key: string) => {
   const store = (item: T) => {
-    if (typeof item !== 'string') return storage.set(key, JSON.stringify(item));
-    else return storage.set(key, item);
+    if (typeof item !== 'string')
+      return storageAccessorsInstance.set(key, JSON.stringify(item));
+    else return storageAccessorsInstance.set(key, item);
   };
   const retrieve = () => {
     try {
-      const string = storage.getString(key);
+      const string = storageAccessorsInstance.getString(key);
       if (string) {
         try {
           return JSON.parse(string) as T;
@@ -19,13 +20,13 @@ export const createStorageAccessors = <T>(key: string) => {
       }
       return undefined;
     } catch (error) {
-      console.error($lf(22), error);
+      console.error($lf(23), error);
       return undefined;
     }
   };
   const remove = () => {
     const user = retrieve();
-    storage.delete(key);
+    storageAccessorsInstance.delete(key);
     return user;
   };
   return {
@@ -34,8 +35,6 @@ export const createStorageAccessors = <T>(key: string) => {
     remove,
   };
 };
-
-export default storage;
 
 function $lf(n: number) {
   return '$lf|essentials/utils/createMMKVStorageAccessors.ts:' + n + ' >';

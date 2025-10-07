@@ -1,17 +1,15 @@
-import { useEffect, useState, type ReactNode } from 'react';
-import {
-  useLocalization,
-  type LocalizationContextValue,
-} from '../providers/Localization.provider';
-
-export type TranslateTextProps = { children: ReactNode };
+import { useEffect, useState } from 'react';
+import { useLocalization } from '../providers/Localization.provider';
+import type {
+  LocalizationComponentProps,
+  TranslateTextProps,
+  TranslationComponentProps,
+} from './Text.types';
 
 export function TranslateText(props: TranslateTextProps) {
   if (typeof props.children !== 'string') return props.children;
   return <LocalizationComponent text={props.children} />;
 }
-
-export type LocalizationComponentProps = { text: string };
 
 export function LocalizationComponent(props: LocalizationComponentProps) {
   const localization = useLocalization();
@@ -19,17 +17,13 @@ export function LocalizationComponent(props: LocalizationComponentProps) {
   return <TranslationComponent localization={localization} text={props.text} />;
 }
 
-export type TranslationComponentProps = {
-  localization: LocalizationContextValue;
-  text: string;
-};
 export function TranslationComponent(props: TranslationComponentProps) {
   const [translated, setTranslated] = useState(props.text);
   useEffect(() => {
     props.localization
       .translate(props.text)
       .then((t) => setTranslated(t))
-      .catch((e) => console.error($lf(32), e));
+      .catch((e) => console.error($lf(27), e));
   }, [props.text, props.localization]);
   return translated;
 }
