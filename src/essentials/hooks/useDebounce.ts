@@ -9,7 +9,7 @@ export type UseDebounceProps = {
   onDebounceInvocation?: () => void | Promise<void>;
 };
 
-export default function useDebounce(props: UseDebounceProps) {
+export function useDebounce(props: UseDebounceProps) {
   const debounceTimerRef = useRef<Scheduler.Timer>(
     new Scheduler.Timer(async () => {
       await props.onPreTrigger?.();

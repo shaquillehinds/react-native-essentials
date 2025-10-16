@@ -10,7 +10,7 @@ export type UseIntervalProps = {
   onPostTrigger?: () => void | Promise<void>;
 };
 
-export default function useInterval(props: UseIntervalProps) {
+export function useInterval(props: UseIntervalProps) {
   const intervalScheduleRef = useRef<Scheduler.Schedule>(
     new Scheduler.Schedule(async () => {
       await props.onPreTrigger?.();
