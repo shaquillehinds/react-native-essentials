@@ -1,4 +1,5 @@
 export { filterMap, type FilterMapFunc } from './filterMap';
+export * from './advancedMap';
 export { measureAsync, type MeasureInputAsyncResponse } from './measureAsync';
 export { getSequantialRandomId } from './randomSequentialId';
 export * as Scheduler from './Scheduler';
