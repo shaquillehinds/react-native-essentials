@@ -154,3 +154,21 @@ export function hexOpacity(percentage: number): string {
   if (hexPercentage.length === 1) return '0' + hexPercentage;
   return hexPercentage;
 }
+
+export function secondsToTime(
+  secs: number,
+  props?: { hideSeconds?: boolean; hideHours?: boolean }
+) {
+  const seconds = Math.floor(secs);
+  const secondsRemainder = Math.floor(seconds % 60);
+  const minutes = Math.floor(seconds / 60);
+  const minutesRemainder = Math.floor(minutes % 60);
+  const hours = Math.floor(minutes / 60);
+  const secondsString = String(secondsRemainder).padStart(2, '0');
+  const minutesString = String(minutesRemainder).padStart(2, '0');
+  const allMinutesString = String(minutes).padStart(2, '0');
+  const hoursString = String(hours).padStart(2, '0');
+  if (props?.hideHours) return `${allMinutesString}:${secondsString}`;
+  if (props?.hideSeconds) return `${hoursString}:${minutesString}`;
+  return `${hoursString}:${minutesString}:${secondsString}`;
+}
