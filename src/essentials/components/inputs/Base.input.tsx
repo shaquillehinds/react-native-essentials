@@ -9,6 +9,7 @@ import { RowLayout } from '../layouts';
 import type { BaseInputProps } from './Input.types';
 import { isAndroid } from '../../constants/device.const';
 import { useRef, useState } from 'react';
+import { StateTextInput } from './StateText.input';
 
 export function BaseInput({
   backgroundColor,
@@ -19,6 +20,7 @@ export function BaseInput({
   refTextInput,
   focusedBorderColor,
   blurredBorderColor,
+  refStateInput,
   style,
   ...rest
 }: BaseInputProps) {
@@ -54,6 +56,26 @@ export function BaseInput({
           placeholder={textInputProps.placeholder ?? 'Type here...'}
           style={[inputStyle, textInputProps.style]}
           {...textInputProps}
+          onTouchEnd={(e) => {
+            inputRef.current?.focus();
+            textInputProps.onTouchEnd?.(e);
+          }}
+          onFocus={(e) => {
+            setIsFocused(true);
+            textInputProps.onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setIsFocused(false);
+            textInputProps.onBlur?.(e);
+          }}
+        />
+      ) : refStateInput ? (
+        <StateTextInput
+          ref={inputRef}
+          refStateInput={refStateInput}
+          {...textInputProps}
+          placeholder={textInputProps.placeholder ?? 'Type here...'}
+          style={[inputStyle, textInputProps.style]}
           onTouchEnd={(e) => {
             inputRef.current?.focus();
             textInputProps.onTouchEnd?.(e);

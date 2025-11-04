@@ -1,5 +1,6 @@
 import type { TextInput, TextInputProps } from 'react-native';
 import type { LayoutProps } from '../layouts';
+import type { StateInputRef } from './StateText.input';
 
 export type BaseInputProps = {
   backgroundColor: string;
@@ -14,4 +15,5 @@ export type BaseInputProps = {
     }
   ) => React.JSX.Element;
   refTextInput?: React.MutableRefObject<TextInput | null>;
+  refStateInput?: React.RefObject<StateInputRef>;
 } & LayoutProps;
