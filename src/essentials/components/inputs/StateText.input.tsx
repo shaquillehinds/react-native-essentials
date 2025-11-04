@@ -11,7 +11,7 @@ export type StateInputRef = {
   setValue: React.Dispatch<React.SetStateAction<string>>;
 };
 export type StateInputProps = {
-  refStateInput?: React.RefObject<StateInputRef>;
+  refStateInput?: React.MutableRefObject<StateInputRef | null>;
 } & TextInputProps;
 
 export const StateTextInput = forwardRef(function ({
