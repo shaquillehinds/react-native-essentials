@@ -10,23 +10,29 @@ export type StateInputRef = {
   value: string;
   setValue: React.Dispatch<React.SetStateAction<string>>;
 };
-export type StateInputProps = {
-  refStateInput?: React.MutableRefObject<StateInputRef | null>;
-} & TextInputProps;
 
-export const StateTextInput = forwardRef(function ({
-  refStateInput,
-  onChangeText,
-  ...rest
-}: StateInputProps) {
-  const [value, setValue] = useState('');
-  const onTextChange = useCallback((val: string) => {
-    setValue(val);
-    onChangeText?.(val);
-  }, []);
-  useImperativeHandle(refStateInput, () => ({
-    value,
-    setValue,
-  }));
-  return <TextInput {...rest} value={value} onChangeText={onTextChange} />;
-});
+export type StateInputProps = TextInputProps & {
+  refStateInput?: React.Ref<StateInputRef>;
+};
+
+export const StateTextInput = forwardRef<TextInput, StateInputProps>(
+  ({ onChangeText, refStateInput, ...rest }, ref) => {
+    const [value, setValue] = useState('');
+
+    const onTextChange = useCallback(
+      (val: string) => {
+        setValue(val);
+        onChangeText?.(val);
+      },
+      [onChangeText]
+    );
+
+    useImperativeHandle(refStateInput, () => ({
+      value,
+      setValue,
+    }));
+
+    //prettier-ignore
+    return <TextInput ref={ref} {...rest} value={value} onChangeText={onTextChange} />;
+  }
+);
