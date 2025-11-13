@@ -30,7 +30,7 @@ export const createStorageAccessors = <T>(key: string) => {
       }
       return undefined;
     } catch (error) {
-      console.error($lf(26), error);
+      console.error($lf(33), error);
       return undefined;
     }
   };
@@ -42,7 +42,7 @@ export const createStorageAccessors = <T>(key: string) => {
   const useString = () => useMMKVString(key, storageAccessorsInstance);
   const useNumber = () => useMMKVNumber(key, storageAccessorsInstance);
   const useBoolean = () => useMMKVBoolean(key, storageAccessorsInstance);
-  const useObject = () => useMMKVObject(key, storageAccessorsInstance);
+  const useObject = () => useMMKVObject<T>(key, storageAccessorsInstance);
   const useBuffer = () => useMMKVBuffer(key, storageAccessorsInstance);
   return {
     store,
@@ -76,7 +76,7 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
       }
       return undefined;
     } catch (error) {
-      console.error($lf(72), error);
+      console.error($lf(79), error);
       return undefined;
     }
   };
@@ -93,7 +93,7 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
   const useBoolean = (keySuffix: string) =>
     useMMKVBoolean(`${baseKey}-${keySuffix}`, storageAccessorsInstance);
   const useObject = (keySuffix: string) =>
-    useMMKVObject(`${baseKey}-${keySuffix}`, storageAccessorsInstance);
+    useMMKVObject<T>(`${baseKey}-${keySuffix}`, storageAccessorsInstance);
   const useBuffer = (keySuffix: string) =>
     useMMKVBuffer(`${baseKey}-${keySuffix}`, storageAccessorsInstance);
   return {
