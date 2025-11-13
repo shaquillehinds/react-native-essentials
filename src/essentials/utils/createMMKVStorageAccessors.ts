@@ -57,14 +57,31 @@ export const createStorageAccessors = <T>(key: string) => {
 };
 
 export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
+  const storedKeysKey = `#${baseKey}#`;
+  const KEY = baseKey + '-';
+  const keysDelimiter = '||';
+  const retrieveKeys = () =>
+    storageAccessorsInstance.getString(storedKeysKey) || '';
+  const storeKey = (key: string) =>
+    storageAccessorsInstance.set(
+      storedKeysKey,
+      retrieveKeys() + keysDelimiter + key
+    );
+  const removeKey = (key: string) =>
+    storageAccessorsInstance.set(
+      storedKeysKey,
+      retrieveKeys().replace(keysDelimiter + key, '')
+    );
+
   const store = (keySuffix: string, item: T) => {
-    const key = baseKey + '-' + keySuffix;
+    const key = KEY + keySuffix;
+    storeKey(key);
     if (typeof item !== 'string')
       return storageAccessorsInstance.set(key, JSON.stringify(item));
     else return storageAccessorsInstance.set(key, item);
   };
   const retrieve = (keySuffix: string) => {
-    const key = baseKey + '-' + keySuffix;
+    const key = KEY + keySuffix;
     try {
       const string = storageAccessorsInstance.getString(key);
       if (string) {
@@ -76,30 +93,50 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
       }
       return undefined;
     } catch (error) {
-      console.error($lf(79), error);
+      console.error($lf(96), error);
       return undefined;
     }
   };
+  const retrieveAll = () => {
+    const delimiter = keysDelimiter + KEY;
+    const keys = retrieveKeys().split(delimiter);
+    const items: T[] = [];
+    for (const keySuffix of keys) {
+      const item = retrieve(keySuffix);
+      if (item) items.push(item);
+    }
+    return items;
+  };
   const remove = (keySuffix: string) => {
-    const key = baseKey + '-' + keySuffix;
+    const key = KEY + keySuffix;
+    removeKey(key);
     const item = retrieve(keySuffix);
     storageAccessorsInstance.delete(key);
     return item;
   };
+  const removeAll = () => {
+    const delimiter = keysDelimiter + KEY;
+    const keys = retrieveKeys().split(delimiter);
+    for (const keySuffix of keys) {
+      keySuffix && storageAccessorsInstance.delete(KEY + keySuffix);
+    }
+  };
   const useString = (keySuffix: string) =>
-    useMMKVString(`${baseKey}-${keySuffix}`, storageAccessorsInstance);
+    useMMKVString(KEY + keySuffix, storageAccessorsInstance);
   const useNumber = (keySuffix: string) =>
-    useMMKVNumber(`${baseKey}-${keySuffix}`, storageAccessorsInstance);
+    useMMKVNumber(KEY + keySuffix, storageAccessorsInstance);
   const useBoolean = (keySuffix: string) =>
-    useMMKVBoolean(`${baseKey}-${keySuffix}`, storageAccessorsInstance);
+    useMMKVBoolean(KEY + keySuffix, storageAccessorsInstance);
   const useObject = (keySuffix: string) =>
-    useMMKVObject<T>(`${baseKey}-${keySuffix}`, storageAccessorsInstance);
+    useMMKVObject<T>(KEY + keySuffix, storageAccessorsInstance);
   const useBuffer = (keySuffix: string) =>
-    useMMKVBuffer(`${baseKey}-${keySuffix}`, storageAccessorsInstance);
+    useMMKVBuffer(KEY + keySuffix, storageAccessorsInstance);
   return {
     store,
     retrieve,
+    retrieveAll,
     remove,
+    removeAll,
     useString,
     useNumber,
     useBoolean,
