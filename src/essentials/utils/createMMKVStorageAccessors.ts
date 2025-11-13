@@ -1,6 +1,16 @@
-import { MMKV } from 'react-native-mmkv';
+import {
+  MMKV,
+  useMMKVBoolean,
+  useMMKVBuffer,
+  useMMKVNumber,
+  useMMKVObject,
+  useMMKVString,
+} from 'react-native-mmkv';
 
-export const storageAccessorsInstance = new MMKV({ id: 'rne-csa' });
+export const storageAccessorsInstanceID = 'rne-csa';
+export const storageAccessorsInstance = new MMKV({
+  id: storageAccessorsInstanceID,
+});
 
 export const createStorageAccessors = <T>(key: string) => {
   const store = (item: T) => {
@@ -20,7 +30,7 @@ export const createStorageAccessors = <T>(key: string) => {
       }
       return undefined;
     } catch (error) {
-      console.error($lf(23), error);
+      console.error($lf(26), error);
       return undefined;
     }
   };
@@ -29,10 +39,20 @@ export const createStorageAccessors = <T>(key: string) => {
     storageAccessorsInstance.delete(key);
     return item;
   };
+  const useString = () => useMMKVString(key, storageAccessorsInstance);
+  const useNumber = () => useMMKVNumber(key, storageAccessorsInstance);
+  const useBoolean = () => useMMKVBoolean(key, storageAccessorsInstance);
+  const useObject = () => useMMKVObject(key, storageAccessorsInstance);
+  const useBuffer = () => useMMKVBuffer(key, storageAccessorsInstance);
   return {
     store,
     retrieve,
     remove,
+    useString,
+    useNumber,
+    useBoolean,
+    useObject,
+    useBuffer,
   };
 };
 
@@ -56,7 +76,7 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
       }
       return undefined;
     } catch (error) {
-      console.error($lf(59), error);
+      console.error($lf(72), error);
       return undefined;
     }
   };
@@ -66,10 +86,25 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
     storageAccessorsInstance.delete(key);
     return item;
   };
+  const useString = (keySuffix: string) =>
+    useMMKVString(`${baseKey}-${keySuffix}`, storageAccessorsInstance);
+  const useNumber = (keySuffix: string) =>
+    useMMKVNumber(`${baseKey}-${keySuffix}`, storageAccessorsInstance);
+  const useBoolean = (keySuffix: string) =>
+    useMMKVBoolean(`${baseKey}-${keySuffix}`, storageAccessorsInstance);
+  const useObject = (keySuffix: string) =>
+    useMMKVObject(`${baseKey}-${keySuffix}`, storageAccessorsInstance);
+  const useBuffer = (keySuffix: string) =>
+    useMMKVBuffer(`${baseKey}-${keySuffix}`, storageAccessorsInstance);
   return {
     store,
     retrieve,
     remove,
+    useString,
+    useNumber,
+    useBoolean,
+    useObject,
+    useBuffer,
   };
 };
 
