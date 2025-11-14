@@ -1,9 +1,7 @@
 import { type AnimatedStyle } from 'react-native-reanimated';
-import type { FontSize, FontStyle } from '../typography';
-import type { Spaces } from '../../styles';
+import type { BaseTextProps } from '../typography';
 import type {
   FlexAlignType,
-  GestureResponderEvent,
   StyleProp,
   TextStyle,
   ViewStyle,
@@ -20,26 +18,16 @@ export type RadiusSize =
   | 'round';
 export type ButtonSize = 'small' | 'large' | 'medium' | 'auto' | 'wide';
 
-export interface ButtonProps {
-  translate?: boolean;
-  disabled?: boolean;
+export interface ButtonProps extends Omit<BaseTextProps, 'style'> {
   loading?: LoadingIndicatorProps | boolean;
   borderColor?: string;
   borderRadius?: RadiusSize;
   borderWidth?: BorderSize;
   backgroundColor?: string;
-  onPress?: (event: GestureResponderEvent) => void;
-  onLongPress?: (event: GestureResponderEvent) => void;
   activeOpacity?: number;
-  fontStyle?: FontStyle;
-  fontSize?: FontSize;
   customFontColor?: string;
   buttonSize?: ButtonSize;
   textStyle?: StyleProp<AnimatedStyle<StyleProp<TextStyle>>>;
-  animateText?: boolean;
-  animate?: boolean;
-  padding?: Spaces;
-  margin?: Spaces;
   alignSelf?: FlexAlignType;
   style?: StyleProp<AnimatedStyle<StyleProp<ViewStyle>>>;
   rightComponent?: JSX.Element;

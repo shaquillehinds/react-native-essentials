@@ -13,22 +13,45 @@ import { Press } from '../wrappers';
 import type { ButtonProps } from './Button.types';
 import { useDeviceOrientation, useFontSizes } from '../../hooks';
 
-export function BaseButton(props: PropsWithChildren<ButtonProps>) {
+export function BaseButton({
+  buttonSize,
+  padding,
+  borderColor,
+  borderWidth,
+  borderRadius,
+  alignSelf,
+  backgroundColor,
+  animate,
+  loading,
+  fontSize,
+  disabled,
+  margin,
+  customFontColor,
+  leftComponent,
+  onPress,
+  activeOpacity,
+  textStyle,
+  children,
+  rightComponent,
+  style,
+  fontStyle,
+  ...rest
+}: PropsWithChildren<ButtonProps>) {
   const orientation = useDeviceOrientation();
   const fontSizes = useFontSizes();
-  const sizes = buttonSizes[props.buttonSize || 'medium'];
+  const sizes = buttonSizes[buttonSize || 'medium'];
   const configuredStyles: ViewStyle = {
-    ...transformSpacing({ padding: props.padding, orientation }),
-    borderWidth: borderSizes[props.borderWidth || 'thin'],
-    borderColor: props.borderColor || 'transparent',
+    ...transformSpacing({ padding, orientation }),
+    borderWidth: borderSizes[borderWidth || 'thin'],
+    borderColor: borderColor || 'transparent',
     paddingHorizontal: sizes.paddingHorizontal,
     paddingVertical: sizes.paddingVertical,
-    borderRadius: props.borderRadius
-      ? radiusSizes[props.borderRadius]
+    borderRadius: borderRadius
+      ? radiusSizes[borderRadius]
       : radiusSizes[sizes.borderRadius],
     width: sizes.width,
-    alignSelf: props.alignSelf,
-    backgroundColor: props.backgroundColor,
+    alignSelf,
+    backgroundColor,
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
@@ -37,51 +60,46 @@ export function BaseButton(props: PropsWithChildren<ButtonProps>) {
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    opacity: props.loading ? 0 : 1,
+    opacity: loading ? 0 : 1,
   };
   const loadingContainerStyle: ViewStyle = {
     position: 'absolute',
   };
 
-  const ViewComponent = props.animate
+  const ViewComponent = animate
     ? Animated.View
     : (View as unknown as typeof Animated.View);
 
-  const fontSize = props.fontSize || sizes.fontSize;
+  const fSize = fontSize || sizes.fontSize;
   return (
     <Press
-      activeOpacity={props.disabled ? 0.5 : props.activeOpacity || 0.8}
+      activeOpacity={disabled ? 0.5 : activeOpacity || 0.8}
       style={{
-        ...transformSpacing({ margin: props.margin, orientation }),
+        ...transformSpacing({ margin, orientation }),
         width: configuredStyles.width,
         alignSelf: configuredStyles.alignSelf || 'center',
       }}
-      onPress={props.onPress}
-      disabled={props.disabled || !!props.loading}
+      onPress={onPress}
+      disabled={disabled || !!loading}
     >
-      <ViewComponent style={[configuredStyles, props.style]}>
+      <ViewComponent style={[configuredStyles, style]}>
         <View style={contentStyle}>
-          {props.leftComponent}
+          {leftComponent}
           <BaseText
-            animate={props.animateText}
-            animatedStyle={[
-              { lineHeight: fontSizes[fontSize] * 1.3 },
-              props.textStyle,
-            ]}
+            {...rest}
             fontSize={fontSize}
-            fontStyle={props.fontStyle || 'Medium'}
-            customColor={props.customFontColor}
-            translate={props.translate}
+            fontStyle={fontStyle || 'Medium'}
+            animatedStyle={[{ lineHeight: fontSizes[fSize] * 1.3 }, textStyle]}
           >
-            {props.children || 'Submit'}
+            {children || 'Submit'}
           </BaseText>
-          {props.rightComponent}
+          {rightComponent}
         </View>
-        {props.loading ? (
+        {loading ? (
           <View style={loadingContainerStyle}>
             <ArcSpinnerAnimation
-              size={fontSizes[fontSize] * 1.3}
-              color={props.customFontColor}
+              size={fontSizes[fSize] * 1.3}
+              color={customFontColor}
             />
           </View>
         ) : null}
