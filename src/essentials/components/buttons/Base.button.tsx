@@ -87,6 +87,7 @@ export function BaseButton({
           {leftComponent}
           <BaseText
             {...rest}
+            customColor={customFontColor}
             fontSize={fontSize}
             fontStyle={fontStyle || 'Medium'}
             animatedStyle={[{ lineHeight: fontSizes[fSize] * 1.3 }, textStyle]}
