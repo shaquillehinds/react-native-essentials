@@ -51,6 +51,9 @@ export function useInterval(props: UseIntervalProps) {
 
   useEffect(() => {
     props.autoStart && startInterval();
+    return () => {
+      stopInterval();
+    };
   }, [props.autoStart]);
 
   return { startInterval, stopInterval };
