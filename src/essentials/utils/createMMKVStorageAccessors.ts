@@ -14,7 +14,9 @@ export const storageAccessorsInstance = new MMKV({
 
 export const createStorageAccessors = <T>(key: string) => {
   const store = (item: T) => {
-    if (typeof item !== 'string')
+    if (typeof item === 'boolean' || typeof item === 'number')
+      return storageAccessorsInstance.set(key, item);
+    else if (typeof item !== 'string')
       return storageAccessorsInstance.set(key, JSON.stringify(item));
     else return storageAccessorsInstance.set(key, item);
   };
@@ -30,7 +32,7 @@ export const createStorageAccessors = <T>(key: string) => {
       }
       return undefined;
     } catch (error) {
-      console.error($lf(33), error);
+      console.error($lf(35), error);
       return undefined;
     }
   };
@@ -93,7 +95,7 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
       }
       return undefined;
     } catch (error) {
-      console.error($lf(96), error);
+      console.error($lf(98), error);
       return undefined;
     }
   };
