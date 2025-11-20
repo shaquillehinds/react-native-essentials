@@ -1,21 +1,22 @@
-import { useState } from 'react';
-// import { AxiosResponse } from 'axios';
+import { useRef, useState } from 'react';
+import { wait } from '../utils';
 
-export interface ItemsFetchingFunctionProps {
+export type ItemsFetchingFunctionProps = {
   limit: number;
   skip: number;
-}
+};
 
 export type ItemsFetchingFunction<ListItem> = (
   props: ItemsFetchingFunctionProps
 ) => Promise<ListItem[]>;
-//  | AxiosResponse<ListItem[]>;
 
-interface UseScrollableItemsProps<ListItem, FetchingFunctionArgs> {
+export type UseScrollableItemsProps<ListItem, FetchingFunctionArgs> = {
   limit?: number;
+  minFetchDuration?: number;
+  fetchCooldown?: number;
   itemsFetchingFunction: ItemsFetchingFunction<ListItem>;
   itemsFetchingFunctionArgs?: FetchingFunctionArgs;
-}
+};
 
 export function useScrollableItems<ListItem, FetchingFunctionArgs extends {}>(
   props: UseScrollableItemsProps<ListItem, FetchingFunctionArgs>
@@ -24,25 +25,34 @@ export function useScrollableItems<ListItem, FetchingFunctionArgs extends {}>(
 
   const [items, setItems] = useState<ListItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [loaded, setLoaded] = useState(false);
   const [allItemsFetched, setAllItemsFetched] = useState(false);
   const [refreshingItems, setRefreshingItems] = useState(false);
+  const isFetching = useRef(false);
+  const isInitialized = useRef(false);
 
   const fetchItems = async (prop?: { refresh: boolean }) => {
+    if (isFetching.current) return;
+    isFetching.current = true;
     if (prop?.refresh) setAllItemsFetched(false);
     const skip = prop?.refresh ? 0 : items.length;
-    const response = await props.itemsFetchingFunction({
-      ...(props.itemsFetchingFunctionArgs || {}),
-      limit,
-      skip,
-    });
+    const [response] = await Promise.all([
+      await props.itemsFetchingFunction({
+        ...(props.itemsFetchingFunctionArgs || {}),
+        limit,
+        skip,
+      }),
+      await wait(props.minFetchDuration || 0),
+    ]);
     let list: ListItem[] = response;
-    // if (response instanceof Array) list = response;
-    // else list = response.data;
     if (list.length < limit) setAllItemsFetched(true);
     if (prop?.refresh) setItems(list);
     else setItems((prev) => [...prev, ...list]);
     setLoading(false);
+    if (props.fetchCooldown) {
+      setTimeout(() => {
+        isFetching.current = false;
+      }, props.fetchCooldown);
+    } else isFetching.current = false;
   };
   const onRefreshItems = async () => {
     setLoading(true);
@@ -51,9 +61,9 @@ export function useScrollableItems<ListItem, FetchingFunctionArgs extends {}>(
   };
 
   const onLayout = () => {
-    if (!loaded) {
+    if (!isInitialized.current) {
       fetchItems();
-      setLoaded(true);
+      isInitialized.current = true;
     }
   };
   const onItemsEndReached = () => {
