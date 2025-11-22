@@ -5,7 +5,7 @@ import {useContext,useMemo,useRef,useState,type PropsWithChildren} from 'react';
 export type CollectedDataType = Record<string, any>;
 export type CollectDataArgs = { key: string; value: any };
 //prettier-ignore
-export type CollectDataProps = ((data: CollectedDataType)=>CollectDataArgs) | CollectDataArgs
+export type CollectDataProps = ((data: CollectedDataType)=>CollectedDataType) | CollectDataArgs
 
 //prettier-ignore
 export type CollectedDataContextValue = { collected: CollectedDataType } | undefined;
@@ -30,12 +30,9 @@ export const DataCollectionProvider = ({
     () => ({
       collectedDataRef,
       collectData: (props: CollectDataProps) => {
-        if ('key' in props) {
+        if ('key' in props)
           setData((prev) => ({ ...prev, [props.key]: props.value }));
-        } else {
-          const newData = props(collectedDataRef.current);
-          setData((prev) => ({ ...prev, [newData.key]: newData.value }));
-        }
+        else setData((prev) => props(prev));
       },
     }),
     []
