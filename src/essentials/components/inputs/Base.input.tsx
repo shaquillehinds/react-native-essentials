@@ -21,6 +21,7 @@ export function BaseInput({
   focusedBorderColor,
   blurredBorderColor,
   refStateInput,
+  refStateInputValidator,
   style,
   ...rest
 }: BaseInputProps) {
@@ -73,6 +74,7 @@ export function BaseInput({
         <StateTextInput
           ref={inputRef}
           refStateInput={refStateInput}
+          refStateInputValidator={refStateInputValidator}
           {...textInputProps}
           placeholder={textInputProps.placeholder ?? 'Type here...'}
           style={[inputStyle, textInputProps.style]}

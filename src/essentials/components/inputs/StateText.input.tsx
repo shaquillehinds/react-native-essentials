@@ -13,16 +13,24 @@ export type StateInputRef = {
 
 export type StateInputProps = TextInputProps & {
   refStateInput?: React.Ref<StateInputRef>;
+  refStateInputValidator?: (text: string) => boolean;
 };
 
 export const StateTextInput = forwardRef<TextInput, StateInputProps>(
-  ({ onChangeText, refStateInput, ...rest }, ref) => {
+  ({ onChangeText, refStateInput, refStateInputValidator, ...rest }, ref) => {
     const [value, setValue] = useState('');
 
     const onTextChange = useCallback(
       (val: string) => {
-        setValue(val);
-        onChangeText?.(val);
+        if (refStateInputValidator) {
+          if (refStateInputValidator(val)) {
+            setValue(val);
+            onChangeText?.(val);
+          }
+        } else {
+          setValue(val);
+          onChangeText?.(val);
+        }
       },
       [onChangeText]
     );
