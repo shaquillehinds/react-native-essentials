@@ -7,9 +7,10 @@ export type CollectDataArgs = { key: string; value: any };
 //prettier-ignore
 export type CollectDataProps = ((data: CollectedDataType)=>CollectDataArgs) | CollectDataArgs
 
-export type CollectedDataContextValue = { collected: CollectedDataType };
 //prettier-ignore
-export type DataCollectionContextValue = {collectData: (props:CollectDataProps)=>void, collectedDataRef: React.MutableRefObject<CollectedDataType>}
+export type CollectedDataContextValue = { collected: CollectedDataType } | undefined;
+//prettier-ignore
+export type DataCollectionContextValue = {collectData: (props:CollectDataProps)=>void, collectedDataRef: React.MutableRefObject<CollectedDataType>} | undefined
 
 export type DataCollectionProviderProps = PropsWithChildren<{
   CollectedDataContext: React.Context<CollectedDataContextValue>;
