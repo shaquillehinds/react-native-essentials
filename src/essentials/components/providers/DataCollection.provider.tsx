@@ -71,8 +71,9 @@ export function createDataCollector<T extends CollectedDataType>({
   CollectedDataContext,
 }: DataCollectionProviderProps<T>) {
   return {
-    Provider: (
+    Provider: ({ children }: PropsWithChildren) => (
       <DataCollectionProvider
+        children={children}
         DataCollectionContext={DataCollectionContext}
         CollectedDataContext={CollectedDataContext}
       />
