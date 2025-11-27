@@ -1,11 +1,11 @@
-import {
-  type GestureResponderNativeEventSnapshot,
-  snapShotGestureResponderEvent,
-  wait,
-} from '@shaquillehinds/react-native-essentials';
 import { useRef } from 'react';
 import type { GestureResponderEvent, ViewProps } from 'react-native';
 import { Animated as RNAnimated } from 'react-native';
+import {
+  snapShotGestureResponderEvent,
+  wait,
+  type GestureResponderNativeEventSnapshot,
+} from '../../utils';
 
 export interface RNPressProps extends ViewProps {
   disableAnimation?: boolean;
