@@ -2,7 +2,7 @@
 //prettier-ignore
 import {useContext,useMemo,useRef,useState,type PropsWithChildren} from 'react';
 
-export type DataKey = string | number | symbol;
+export type DataKey = string;
 
 export type CollectedDataType = Record<DataKey, any>;
 //prettier-ignore
@@ -28,7 +28,7 @@ export const DataCollectionProvider = <T extends CollectedDataType>({
   DataCollectionContext,
   CollectedDataContext,
 }: DataCollectionProviderProps<T>) => {
-  const [data, setData] = useState<Partial<T>>({} as Partial<T>);
+  const [data, setData] = useState<Partial<T>>({});
   const collectedDataRef = useRef<Partial<T>>(data);
   collectedDataRef.current = data;
 
