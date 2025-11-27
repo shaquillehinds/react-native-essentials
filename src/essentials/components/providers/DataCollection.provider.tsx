@@ -2,34 +2,39 @@
 //prettier-ignore
 import {useContext,useMemo,useRef,useState,type PropsWithChildren} from 'react';
 
-export type CollectedDataType = Record<string, any>;
-export type CollectDataArgs = { key: string; value: any };
+export type DataKey = string | number | symbol;
+
+export type CollectedDataType = Record<DataKey, any>;
 //prettier-ignore
-export type CollectDataProps = ((data: CollectedDataType)=>CollectedDataType) | CollectDataArgs
+export type CollectDataArgs<T extends CollectedDataType> ={ [K in keyof T]: { key: K; value: T[K] } }[keyof T];
 
 //prettier-ignore
-export type CollectedDataContextValue = { collected: CollectedDataType } | undefined;
+export type CollectDataProps<T extends CollectedDataType> = ((data: T)=>T) | CollectDataArgs<T>
+
 //prettier-ignore
-export type DataCollectionContextValue = {collectData: (props:CollectDataProps)=>void, collectedDataRef: React.MutableRefObject<CollectedDataType>} | undefined
+export type CollectedDataContextValue<T extends CollectedDataType> = { collected:  T } | undefined;
+//prettier-ignore
+export type DataCollectionContextValue<T extends CollectedDataType> = {collectData: (props:CollectDataProps<T>)=>void, collectedDataRef: React.MutableRefObject<T>} | undefined
 
-export type DataCollectionProviderProps = PropsWithChildren<{
-  CollectedDataContext: React.Context<CollectedDataContextValue>;
-  DataCollectionContext: React.Context<DataCollectionContextValue>;
-}>;
+export type DataCollectionProviderProps<T extends CollectedDataType> =
+  PropsWithChildren<{
+    CollectedDataContext: React.Context<CollectedDataContextValue<T>>;
+    DataCollectionContext: React.Context<DataCollectionContextValue<T>>;
+  }>;
 
-export const DataCollectionProvider = ({
+export const DataCollectionProvider = <T extends CollectedDataType>({
   children,
   DataCollectionContext,
   CollectedDataContext,
-}: DataCollectionProviderProps) => {
-  const [data, setData] = useState<CollectedDataType>({});
-  const collectedDataRef = useRef<CollectedDataType>(data);
+}: DataCollectionProviderProps<T>) => {
+  const [data, setData] = useState<T>({} as T);
+  const collectedDataRef = useRef<T>(data);
   collectedDataRef.current = data;
 
   const value = useMemo(
     () => ({
       collectedDataRef,
-      collectData: (props: CollectDataProps) => {
+      collectData: (props: CollectDataProps<T>) => {
         if ('key' in props)
           setData((prev) => ({ ...prev, [props.key]: props.value }));
         else setData((prev) => props(prev));
@@ -47,14 +52,40 @@ export const DataCollectionProvider = ({
 };
 
 //prettier-ignore
-export const useDataCollection = (DataCollectionContext:  React.Context<DataCollectionContextValue>) => {
+export const useDataCollection = <T extends CollectedDataType = CollectedDataType> (DataCollectionContext:  React.Context<DataCollectionContextValue<T>>) => {
   const context = useContext(DataCollectionContext);
   if (!context) return null;
   return context;
 };
 //prettier-ignore
-export const useCollectedData = (CollectedDataContext: React.Context<CollectedDataContextValue>) => {
+export const useCollectedData = <T extends CollectedDataType = CollectedDataType> (CollectedDataContext: React.Context<CollectedDataContextValue<T>>) => {
   const context = useContext(CollectedDataContext);
   if (!context) return null;
   return context;
 };
+
+export function createDataCollector<T extends CollectedDataType>({
+  children,
+  DataCollectionContext,
+  CollectedDataContext,
+}: DataCollectionProviderProps<T>) {
+  return {
+    Provider: (
+      <DataCollectionProvider
+        children={children}
+        DataCollectionContext={DataCollectionContext}
+        CollectedDataContext={CollectedDataContext}
+      />
+    ),
+    useDataCollection: () => {
+      const context = useContext(DataCollectionContext);
+      if (!context) return null;
+      return context;
+    },
+    useCollectedData: () => {
+      const context = useContext(CollectedDataContext);
+      if (!context) return null;
+      return context;
+    },
+  };
+}
