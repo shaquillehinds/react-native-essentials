@@ -67,14 +67,12 @@ export const useCollectedData = <T extends CollectedDataType = CollectedDataType
 };
 
 export function createDataCollector<T extends CollectedDataType>({
-  children,
   DataCollectionContext,
   CollectedDataContext,
 }: DataCollectionProviderProps<T>) {
   return {
     Provider: (
       <DataCollectionProvider
-        children={children}
         DataCollectionContext={DataCollectionContext}
         CollectedDataContext={CollectedDataContext}
       />
