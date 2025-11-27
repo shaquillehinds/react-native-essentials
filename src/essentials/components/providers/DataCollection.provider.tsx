@@ -9,32 +9,34 @@ export type CollectedDataType = Record<DataKey, any>;
 export type CollectDataArgs<T extends CollectedDataType> ={ [K in keyof T]: { key: K; value: T[K] } }[keyof T];
 
 //prettier-ignore
-export type CollectDataProps<T extends CollectedDataType> = ((data: T)=>T) | CollectDataArgs<T>
+export type CollectDataProps<T extends CollectedDataType> = ((data: Partial<T>)=>Partial<T>) | CollectDataArgs<Partial<T>>
 
 //prettier-ignore
-export type CollectedDataContextValue<T extends CollectedDataType> = { collected:  T } | undefined;
+export type CollectedDataContextValue<T extends CollectedDataType = CollectedDataType> = { collected:  Partial<T> } | undefined;
 //prettier-ignore
-export type DataCollectionContextValue<T extends CollectedDataType> = {collectData: (props:CollectDataProps<T>)=>void, collectedDataRef: React.MutableRefObject<T>} | undefined
+export type DataCollectionContextValue<T extends CollectedDataType = CollectedDataType> = {collectData: (props:CollectDataProps<Partial<T>>)=>void, collectedDataRef: React.MutableRefObject<Partial<T>>} | undefined
 
-export type DataCollectionProviderProps<T extends CollectedDataType> =
-  PropsWithChildren<{
-    CollectedDataContext: React.Context<CollectedDataContextValue<T>>;
-    DataCollectionContext: React.Context<DataCollectionContextValue<T>>;
-  }>;
+export type DataCollectionProviderProps<
+  T extends CollectedDataType = CollectedDataType,
+> = PropsWithChildren<{
+  CollectedDataContext: React.Context<CollectedDataContextValue<Partial<T>>>;
+  DataCollectionContext: React.Context<DataCollectionContextValue<Partial<T>>>;
+}>;
 
 export const DataCollectionProvider = <T extends CollectedDataType>({
   children,
   DataCollectionContext,
   CollectedDataContext,
 }: DataCollectionProviderProps<T>) => {
-  const [data, setData] = useState<T>({} as T);
-  const collectedDataRef = useRef<T>(data);
+  const [data, setData] = useState<Partial<T>>({} as Partial<T>);
+  const collectedDataRef = useRef<Partial<T>>(data);
   collectedDataRef.current = data;
 
   const value = useMemo(
     () => ({
       collectedDataRef,
-      collectData: (props: CollectDataProps<T>) => {
+      collectData: (props: CollectDataProps<Partial<T>>) => {
+        if (!props) return;
         if ('key' in props)
           setData((prev) => ({ ...prev, [props.key]: props.value }));
         else setData((prev) => props(prev));
