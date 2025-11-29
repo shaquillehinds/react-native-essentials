@@ -120,9 +120,6 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
           ? orientation.relativeLong(square)
           : height,
 
-    borderColor: borderColor,
-    borderWidth: borderWidth ? borderSizes[borderWidth] : undefined,
-    borderRadius: borderRadius ? radiusSizes[borderRadius] : undefined,
     alignSelf,
     position: absolute ? 'absolute' : undefined,
     flex: flex?.[0],
@@ -133,11 +130,13 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
     left,
     right,
   };
+  if (borderColor) viewStyle.borderColor = borderColor;
+  if (borderWidth) viewStyle.borderWidth = borderSizes[borderWidth];
+  if (borderRadius) viewStyle.borderRadius = radiusSizes[borderRadius];
   const contentStyle: ViewStyle = {
     ...transformSpacing({ padding, orientation }),
     alignItems: center ? 'center' : undefined,
     flexDirection: flexDirection,
-    backgroundColor: backgroundColor,
     flexWrap: wrap ? 'wrap' : 'nowrap',
     justifyContent: spaceEven
       ? 'space-evenly'
@@ -151,6 +150,7 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
               ? 'flex-end'
               : undefined,
   };
+  if (backgroundColor) contentStyle.backgroundColor = backgroundColor;
   if (loading)
     return (
       <LoadingIndicator
