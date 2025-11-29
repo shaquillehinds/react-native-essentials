@@ -3,7 +3,7 @@ import type { BaseTextProps } from './Text.types';
 import { BaseText } from './Base.text';
 
 interface TitleTextProps extends BaseTextProps {
-  fontSize?: 'titleS' | 'titleL';
+  fontSize?: 'titleS' | 'titleM' | 'titleL';
 }
 
 export function Title(props: PropsWithChildren<TitleTextProps>) {

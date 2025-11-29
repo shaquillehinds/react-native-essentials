@@ -3,7 +3,7 @@ import { BaseText } from './Base.text';
 import type { BaseTextProps } from './Text.types';
 
 interface HeadingTextProps extends BaseTextProps {
-  fontSize?: 'headingM' | 'headingL';
+  fontSize?: 'headingM' | 'headingL' | 'headingS';
 }
 
 export function Heading(props: PropsWithChildren<HeadingTextProps>) {
