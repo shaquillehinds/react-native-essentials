@@ -19,6 +19,8 @@ import {
   type SkeletonLoadingIndicatorProps,
 } from '../indicators';
 import { useDeviceOrientation } from '../../hooks';
+import { borderSizes, radiusSizes } from '../../utils/sizeCalculations';
+import type { BorderSize, RadiusSize } from '../buttons/Button.types';
 
 export type LayoutProps<Scrollable extends boolean | undefined = undefined> = {
   skeleton?: { colors?: SkeletonLoadingIndicatorProps['colors'] } | boolean;
@@ -33,6 +35,10 @@ export type LayoutProps<Scrollable extends boolean | undefined = undefined> = {
    * This number will be used as a percentage of the screen height, where 100 is 100% screen height or can be a string of percantage height of it's container
    */
   height?: DimensionValue;
+  /**
+   * Sets both width and height to the same value as a percentage of the screen height. Where 100 is 100% screen height
+   */
+  square?: number;
   flex?: [number] | [number, number] | [number, number, DimensionValue];
   style?: StyleProp<ViewStyle>;
   center?: boolean;
@@ -46,6 +52,9 @@ export type LayoutProps<Scrollable extends boolean | undefined = undefined> = {
   spaceBetween?: boolean;
   flexDirection?: FlexStyle['flexDirection'];
   backgroundColor?: string;
+  borderColor?: string;
+  borderWidth?: BorderSize;
+  borderRadius?: RadiusSize;
   top?: DimensionValue;
   bottom?: DimensionValue;
   left?: DimensionValue;
@@ -80,13 +89,30 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
   spaceEven,
   children,
   style,
+  square,
+  borderColor,
+  borderWidth,
+  borderRadius,
   ...props
 }: PropsWithChildren<LayoutProps<Scrollable>>) {
   const orientation = useDeviceOrientation();
   const viewStyle: ViewStyle = {
     ...transformSpacing({ margin, orientation }),
-    width: typeof width === 'number' ? orientation.relativeX(width) : width,
-    height: typeof height === 'number' ? orientation.relativeY(height) : height,
+    width:
+      typeof width === 'number'
+        ? orientation.relativeX(width)
+        : square
+          ? orientation.relativeLong(square)
+          : width,
+    height:
+      typeof height === 'number'
+        ? orientation.relativeY(height)
+        : square
+          ? orientation.relativeLong(square)
+          : height,
+    borderColor: borderColor,
+    borderWidth: borderWidth ? borderSizes[borderWidth] : undefined,
+    borderRadius: borderRadius ? radiusSizes[borderRadius] : undefined,
     alignSelf,
     position: absolute ? 'absolute' : undefined,
     flex: flex?.[0],

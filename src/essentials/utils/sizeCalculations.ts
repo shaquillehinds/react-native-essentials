@@ -34,6 +34,7 @@ export const radiusSizes: { [key in RadiusSize]: number } = {
   soft: relativeShort(4),
   curvy: relativeShort(6),
   round: relativeShort(8),
+  full: relativeLong(100),
 };
 
 export const buttonSizes: {

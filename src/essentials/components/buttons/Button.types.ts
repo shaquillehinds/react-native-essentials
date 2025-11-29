@@ -15,7 +15,8 @@ export type RadiusSize =
   | 'medium'
   | 'soft'
   | 'curvy'
-  | 'round';
+  | 'round'
+  | 'full';
 export type ButtonSize = 'small' | 'large' | 'medium' | 'auto' | 'wide';
 
 export interface ButtonProps extends Omit<BaseTextProps, 'style'> {
