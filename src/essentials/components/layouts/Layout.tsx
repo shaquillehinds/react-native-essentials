@@ -10,6 +10,7 @@ import {
   type ScrollViewProps,
   type DimensionValue,
 } from 'react-native';
+import type { AnimatedStyle } from 'react-native-reanimated';
 import type { Spacing } from '../../styles/Spacer/Spacer.types';
 import { transformSpacing } from '../../styles/Spacer/Spacer.style';
 import {
@@ -21,8 +22,11 @@ import {
 import { useDeviceOrientation } from '../../hooks';
 import { borderSizes, radiusSizes } from '../../utils/sizeCalculations';
 import type { BorderSize, RadiusSize } from '../buttons/Button.types';
+import Animated from 'react-native-reanimated';
 
 export type LayoutProps<Scrollable extends boolean | undefined = undefined> = {
+  animated?: boolean;
+  animatedStyle?: StyleProp<AnimatedStyle<ViewStyle>>;
   skeleton?: { colors?: SkeletonLoadingIndicatorProps['colors'] } | boolean;
   loading?: LoadingIndicatorProps | boolean;
   scrollable?: Scrollable;
@@ -88,28 +92,21 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
   spaceBetween,
   spaceEven,
   children,
-  style,
   square,
   borderColor,
   borderWidth,
   borderRadius,
+  animated,
+  animatedStyle,
+  style,
   ...props
 }: PropsWithChildren<LayoutProps<Scrollable>>) {
+  const ViewComponent = animated ? Animated.View : View;
+  const ScrollViewComponent = animated ? Animated.ScrollView : ScrollView;
+  const componentStyle = animated ? animatedStyle : style;
   const orientation = useDeviceOrientation();
   const viewStyle: ViewStyle = {
     ...transformSpacing({ margin, orientation }),
-    width:
-      typeof width === 'number'
-        ? orientation.relativeX(width)
-        : square
-          ? orientation.relativeLong(square)
-          : width,
-    height:
-      typeof height === 'number'
-        ? orientation.relativeY(height)
-        : square
-          ? orientation.relativeLong(square)
-          : height,
     borderColor: borderColor,
     borderWidth: borderWidth ? borderSizes[borderWidth] : undefined,
     borderRadius: borderRadius ? radiusSizes[borderRadius] : undefined,
@@ -153,7 +150,11 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
     return (
       <SkeletonViewIndicator
         {...props}
-        style={[contentStyle, viewStyle, style]}
+        style={[
+          contentStyle,
+          viewStyle,
+          componentStyle as StyleProp<ViewStyle>,
+        ]}
         colors={typeof skeleton !== 'boolean' ? skeleton.colors : undefined}
       />
     );
@@ -164,18 +165,21 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
       contentContainerStyle = props.contentContainerStyle as ViewStyle;
     }
     return (
-      <ScrollView
+      <ScrollViewComponent
         {...props}
-        style={[viewStyle, style]}
+        style={[viewStyle, componentStyle as StyleProp<ViewStyle>]}
         contentContainerStyle={[contentStyle, contentContainerStyle]}
       >
         {children}
-      </ScrollView>
+      </ScrollViewComponent>
     );
   }
   return (
-    <View {...props} style={[contentStyle, viewStyle, style]}>
+    <ViewComponent
+      {...props}
+      style={[contentStyle, viewStyle, componentStyle as StyleProp<ViewStyle>]}
+    >
       {children}
-    </View>
+    </ViewComponent>
   );
 }
