@@ -107,6 +107,19 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
   const orientation = useDeviceOrientation();
   const viewStyle: ViewStyle = {
     ...transformSpacing({ margin, orientation }),
+    width:
+      typeof width === 'number'
+        ? orientation.relativeX(width)
+        : square
+          ? orientation.relativeLong(square)
+          : width,
+    height:
+      typeof height === 'number'
+        ? orientation.relativeY(height)
+        : square
+          ? orientation.relativeLong(square)
+          : height,
+
     borderColor: borderColor,
     borderWidth: borderWidth ? borderSizes[borderWidth] : undefined,
     borderRadius: borderRadius ? radiusSizes[borderRadius] : undefined,
