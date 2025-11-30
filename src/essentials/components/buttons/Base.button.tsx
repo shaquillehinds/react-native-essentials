@@ -2,6 +2,7 @@ import type { PropsWithChildren } from 'react';
 import { View, type ViewStyle } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { ArcSpinnerAnimation } from '../../animations/ArcSpinner.animation';
+import { useDeviceOrientation, useFontSizes } from '../../hooks';
 import { transformSpacing } from '../../styles';
 import {
   borderSizes,
@@ -11,7 +12,6 @@ import {
 import { BaseText } from '../typography';
 import { Press } from '../wrappers';
 import type { ButtonProps } from './Button.types';
-import { useDeviceOrientation, useFontSizes } from '../../hooks';
 
 export function BaseButton({
   buttonSize,
@@ -88,7 +88,7 @@ export function BaseButton({
           <BaseText
             {...rest}
             customColor={customFontColor}
-            fontSize={fontSize}
+            fontSize={fSize}
             fontStyle={fontStyle || 'Medium'}
             animatedStyle={[{ lineHeight: fontSizes[fSize] * 1.3 }, textStyle]}
           >

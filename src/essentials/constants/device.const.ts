@@ -15,6 +15,8 @@ export const SCREEN_WIDTH = width;
 export const SCREEN_HEIGHT = height;
 export const WINDOW_WIDTH = wWidth;
 export const WINDOW_HEIGHT = wHeight;
+export const MAX_DIMENSION = Math.max(SCREEN_WIDTH, SCREEN_HEIGHT);
+export const MIN_DIMENSION = Math.min(SCREEN_WIDTH, SCREEN_HEIGHT);
 export const initialOrientation: DeviceOrientation =
   width > height ? 'landscape' : 'portrait';
 export const aspectRatio = height > width ? height / width : width / height;

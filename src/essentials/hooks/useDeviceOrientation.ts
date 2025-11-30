@@ -41,6 +41,8 @@ export const useDeviceOrientation = () => {
   const relativeY = (num: number) => orientation.screenHeight * (num / 100);
   const relativeLong = (num: number) =>
     Math.max(orientation.screenWidth, orientation.screenHeight) * (num / 100);
+  const relativeShort = (num: number) =>
+    Math.min(orientation.screenWidth, orientation.screenHeight) * (num / 100);
 
   return {
     ...orientation,
@@ -54,8 +56,7 @@ export const useDeviceOrientation = () => {
       'worklet';
       return orientation.screenHeight * (num / 100);
     },
-    relativeShort: (num: number) =>
-      Math.min(orientation.screenWidth, orientation.screenHeight) * (num / 100),
+    relativeShort,
     relativeShortWorklet: (num: number) => {
       'worklet';
       return (
@@ -73,6 +74,14 @@ export const useDeviceOrientation = () => {
     },
     normalize: (size: number) => {
       const newSize = relativeLong(size * scale);
+      if (isIOS) {
+        return PixelRatio.roundToNearestPixel(newSize);
+      } else {
+        return Math.round(PixelRatio.roundToNearestPixel(newSize));
+      }
+    },
+    normalizeShort: (size: number) => {
+      const newSize = relativeShort(size * scale);
       if (isIOS) {
         return PixelRatio.roundToNearestPixel(newSize);
       } else {

@@ -1,11 +1,16 @@
 import { type DimensionValue } from 'react-native';
-import { normalize, relativeLong, relativeShort } from './layout';
-import type { FontSize } from '../components/typography/Text.types';
 import type {
   BorderSize,
   ButtonSize,
   RadiusSize,
 } from '../components/buttons/Button.types';
+import type { FontSize } from '../components/typography/Text.types';
+import {
+  normalize,
+  normalizeShort,
+  relativeLong,
+  relativeShort,
+} from './layout';
 
 const fontScale = 1;
 
@@ -28,12 +33,12 @@ export const borderSizes: { [key in BorderSize]: number } = {
 };
 
 export const radiusSizes: { [key in RadiusSize]: number } = {
-  edgy: relativeShort(0.5),
-  sharp: relativeShort(1.5),
-  medium: relativeShort(2.5),
-  soft: relativeShort(4),
-  curvy: relativeShort(6),
-  round: relativeShort(8),
+  edgy: normalize(5),
+  sharp: normalize(10),
+  medium: normalize(15),
+  soft: normalize(20),
+  curvy: normalize(25),
+  round: normalize(30),
   full: relativeLong(100),
 };
 
@@ -47,35 +52,35 @@ export const buttonSizes: {
   };
 } = {
   small: {
-    paddingHorizontal: relativeShort(5),
-    paddingVertical: relativeLong(0.6),
+    paddingHorizontal: normalizeShort(30),
+    paddingVertical: normalizeShort(15),
     fontSize: 'bodyS',
-    borderRadius: 'soft',
+    borderRadius: 'edgy',
   },
   medium: {
-    paddingHorizontal: relativeShort(10),
-    paddingVertical: relativeLong(1.2),
+    paddingHorizontal: normalizeShort(60),
+    paddingVertical: normalizeShort(20),
     fontSize: 'bodyL',
-    borderRadius: 'curvy',
+    borderRadius: 'sharp',
   },
   large: {
-    paddingHorizontal: relativeShort(18),
-    paddingVertical: relativeLong(1.5),
+    paddingHorizontal: normalizeShort(120),
+    paddingVertical: normalizeShort(25),
     fontSize: 'titleS',
-    borderRadius: 'curvy',
+    borderRadius: 'sharp',
   },
   wide: {
-    paddingHorizontal: relativeShort(18),
-    paddingVertical: relativeLong(1.5),
-    fontSize: 'titleS',
-    borderRadius: 'soft',
+    paddingHorizontal: normalizeShort(120),
+    paddingVertical: normalizeShort(25),
+    fontSize: 'titleM',
+    borderRadius: 'sharp',
     width: relativeShort(88),
   },
   auto: {
-    paddingHorizontal: relativeShort(18),
-    paddingVertical: relativeLong(1.5),
-    fontSize: 'titleS',
-    borderRadius: 'soft',
+    paddingHorizontal: normalizeShort(60),
+    paddingVertical: normalizeShort(25),
+    fontSize: 'titleM',
+    borderRadius: 'sharp',
     width: '100%',
   },
 };
