@@ -85,7 +85,7 @@ export function AnimateXYValueComponent(
         if (props.toPosition.length) {
           if (length === 1 && props.toPosition[0]) {
             const firstConfig = props.toPosition[0];
-            if (props.returnToStart && firstConfig.type !== 'decay')
+            if (firstConfig.type !== 'decay')
               animationSwitcher(animatedValue, {
                 ...firstConfig,
                 toValue: props.initialPosition,
