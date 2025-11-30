@@ -17,6 +17,7 @@ export type AnimateComponentRef<T extends InitialValue> = {
   stop: () => void;
   start: () => void;
   reset: () => void;
+  reverse: () => void;
   setValue: (value: T) => void;
   value: T extends XY ? Animated.AnimatedValueXY : Animated.Value;
 };

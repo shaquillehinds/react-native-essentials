@@ -71,6 +71,11 @@ export function AnimateXYValueComponent(
     stop: () => compositionRef.current?.stop(),
     start: () => compositionRef.current?.start(),
     reset: () => compositionRef.current?.reset(),
+    reverse: () => {
+      if (!compositionRef.current) return;
+      compositionRef.current.stop();
+      Animated.loop(compositionRef.current, { iterations: 1 }).start();
+    },
     setValue: (value: XYNumber) => animatedValue.setValue(value),
     value: animatedValue,
   }));

@@ -67,6 +67,11 @@ export function AnimateValueComponent(props: AnimateComponentProps<number>) {
     stop: () => compositionRef.current?.stop(),
     start: () => compositionRef.current?.start(),
     reset: () => compositionRef.current?.reset(),
+    reverse: () => {
+      if (!compositionRef.current) return;
+      compositionRef.current.stop();
+      Animated.loop(compositionRef.current, { iterations: 1 }).start();
+    },
     setValue: (value: number) => animatedValue.setValue(value),
     value: animatedValue,
   }));
