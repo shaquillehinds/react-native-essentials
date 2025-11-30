@@ -20,7 +20,7 @@ export const relativeLong = (num: number) =>
   Math.max(SCREEN_WIDTH, SCREEN_HEIGHT) * (num / 100);
 
 export function normalize(size: number) {
-  const newSize = relativeY(size * scale);
+  const newSize = relativeLong(size * scale);
   if (Platform.OS === 'ios') {
     return PixelRatio.roundToNearestPixel(newSize);
   } else {
