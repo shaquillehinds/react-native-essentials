@@ -68,9 +68,38 @@ export function AnimateValueComponent(props: AnimateComponentProps<number>) {
     start: () => compositionRef.current?.start(),
     reset: () => compositionRef.current?.reset(),
     reverse: () => {
-      if (!compositionRef.current) return;
-      compositionRef.current.stop();
-      Animated.loop(compositionRef.current, { iterations: 1 }).start();
+      compositionRef.current?.stop();
+      if (!Array.isArray(props.toPosition)) {
+        const config = props.toPosition;
+        if (config.type !== 'decay')
+          animationSwitcher(animatedValue, {
+            ...config,
+            toValue: props.initialPosition,
+          }).start();
+      } else {
+        const length = props.toPosition.length;
+        if (props.toPosition.length) {
+          if (length === 1 && props.toPosition[0]) {
+            const firstConfig = props.toPosition[0];
+            if (props.returnToStart && firstConfig.type !== 'decay')
+              animationSwitcher(animatedValue, {
+                ...firstConfig,
+                toValue: props.initialPosition,
+              }).start();
+          } else {
+            Animated.sequence([
+              ...props.toPosition.filterMap((config) => {
+                if (config.type !== 'decay')
+                  return animationSwitcher(animatedValue, {
+                    ...config,
+                    toValue: props.initialPosition,
+                  });
+                return undefined;
+              }),
+            ]);
+          }
+        }
+      }
     },
     setValue: (value: number) => animatedValue.setValue(value),
     value: animatedValue,
