@@ -133,6 +133,7 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
   if (borderColor) viewStyle.borderColor = borderColor;
   if (borderWidth) viewStyle.borderWidth = borderSizes[borderWidth];
   if (borderRadius) viewStyle.borderRadius = radiusSizes[borderRadius];
+  if (backgroundColor) viewStyle.backgroundColor = backgroundColor;
   const contentStyle: ViewStyle = {
     ...transformSpacing({ padding, orientation }),
     alignItems: center ? 'center' : undefined,
