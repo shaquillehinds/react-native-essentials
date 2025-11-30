@@ -1,6 +1,6 @@
 {
   "name": "@shaquillehinds/react-native-essentials",
-  "version": "1.7.14",
+  "version": "1.7.15",
   "description": "Essential constants, styles and hooks for react native.",
   "source": "./src/index.tsx",
   "main": "./lib/commonjs/index.js",
