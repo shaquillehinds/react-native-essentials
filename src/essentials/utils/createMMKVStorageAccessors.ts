@@ -42,11 +42,11 @@ export const createStorageAccessors = <T>(key: string) => {
     try {
       switch (itemType) {
         case 'number':
-          return storageAccessorsInstance.getNumber(key);
+          return storageAccessorsInstance.getNumber(key) as T | undefined;
         case 'boolean':
-          return storageAccessorsInstance.getBoolean(key);
+          return storageAccessorsInstance.getBoolean(key) as T | undefined;
         case 'string':
-          return storageAccessorsInstance.getString(key);
+          return storageAccessorsInstance.getString(key) as T | undefined;
         default: {
           const item = storageAccessorsInstance.getString(key);
           if (item) {
@@ -145,11 +145,11 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
     try {
       switch (itemType) {
         case 'number':
-          return storageAccessorsInstance.getNumber(key);
+          return storageAccessorsInstance.getNumber(key) as T | undefined;
         case 'boolean':
-          return storageAccessorsInstance.getBoolean(key);
+          return storageAccessorsInstance.getBoolean(key) as T | undefined;
         case 'string':
-          return storageAccessorsInstance.getString(key);
+          return storageAccessorsInstance.getString(key) as T | undefined;
         default: {
           const item = storageAccessorsInstance.getString(key);
           if (item) {
@@ -175,7 +175,7 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
       const item = retrieve(keySuffix);
       if (item !== undefined) items.push(item);
     }
-    return items;
+    return items as T[];
   };
   const remove = (keySuffix: string) => {
     const key = KEY + keySuffix;
