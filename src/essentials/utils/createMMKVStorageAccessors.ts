@@ -85,7 +85,10 @@ export const createStorageAccessors = <T>(key: string) => {
       case 'object':
         return useMMKVObject<T>(key, storageAccessorsInstance) as HookType<T>;
       //prettier-ignore
-      default: return [undefined, (_v: undefined | ((curr: undefined) => undefined))=>undefined] as HookType<T>;
+      default: return [undefined, (v: T| ((curr: undefined) => T))=>{
+        if(typeof v === 'function') return store((v as (curr: undefined) => T)(undefined))
+        else return store(v)
+      }] as HookType<T>;
     }
   };
   return {
@@ -165,7 +168,7 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
       }
       return undefined;
     } catch (error) {
-      console.error($lf(168), error);
+      console.error($lf(171), error);
       return undefined;
     }
   };
@@ -214,7 +217,11 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
       //prettier-ignore
       case 'object': return useMMKVObject<T>(KEY + keySuffix, storageAccessorsInstance) as HookType<T>;
       //prettier-ignore
-      default: return [undefined, (_v: undefined | ((curr: undefined) => undefined))=>undefined] as HookType<T>;
+      default: return [undefined, (v: T| ((curr: undefined) => T))=>{
+        const key = KEY + keySuffix;
+        if(typeof v === 'function') return store(key, (v as (curr: undefined) => T)(undefined))
+        else return store(key, v)
+      }] as HookType<T>;
     }
   };
   return {
