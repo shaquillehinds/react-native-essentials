@@ -84,8 +84,8 @@ export const createStorageAccessors = <T>(key: string) => {
         return useMMKVString(key, storageAccessorsInstance) as HookType<T>;
       case 'object':
         return useMMKVObject<T>(key, storageAccessorsInstance) as HookType<T>;
-      default:
-        return null;
+      //prettier-ignore
+      default: return [undefined, (_v: undefined | ((curr: undefined) => undefined))=>undefined] as HookType<T>;
     }
   };
   return {
@@ -213,8 +213,8 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
       case 'string': return useMMKVString(KEY + keySuffix, storageAccessorsInstance) as HookType<T>;
       //prettier-ignore
       case 'object': return useMMKVObject<T>(KEY + keySuffix, storageAccessorsInstance) as HookType<T>;
-      default:
-        return null;
+      //prettier-ignore
+      default: return [undefined, (_v: undefined | ((curr: undefined) => undefined))=>undefined] as HookType<T>;
     }
   };
   return {
