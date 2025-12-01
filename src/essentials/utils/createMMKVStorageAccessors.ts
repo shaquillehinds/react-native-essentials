@@ -82,8 +82,10 @@ export const createStorageAccessors = <T>(key: string) => {
         return useMMKVBoolean(key, storageAccessorsInstance) as HookType<T>;
       case 'string':
         return useMMKVString(key, storageAccessorsInstance) as HookType<T>;
-      default:
+      case 'object':
         return useMMKVObject<T>(key, storageAccessorsInstance) as HookType<T>;
+      default:
+        return null;
     }
   };
   return {
@@ -163,7 +165,7 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
       }
       return undefined;
     } catch (error) {
-      console.error($lf(166), error);
+      console.error($lf(168), error);
       return undefined;
     }
   };
@@ -210,7 +212,9 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
       //prettier-ignore
       case 'string': return useMMKVString(KEY + keySuffix, storageAccessorsInstance) as HookType<T>;
       //prettier-ignore
-      default: return useMMKVObject<T>(KEY + keySuffix, storageAccessorsInstance) as HookType<T>;
+      case 'object': return useMMKVObject<T>(KEY + keySuffix, storageAccessorsInstance) as HookType<T>;
+      default:
+        return null;
     }
   };
   return {
