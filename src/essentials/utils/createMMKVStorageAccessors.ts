@@ -11,28 +11,56 @@ export const storageAccessorsInstanceID = 'rne-csa';
 export const storageAccessorsInstance = new MMKV({
   id: storageAccessorsInstanceID,
 });
+type BasicType = string | number | boolean;
+//prettier-ignore
+type HookType<T> = [T | undefined, (v: T | undefined | ((curr: T | undefined) => T | undefined)) => void];
 
 export const createStorageAccessors = <T>(key: string) => {
+  let itemType: 'string' | 'number' | 'boolean' | 'object' | undefined;
   const store = (item: T) => {
-    if (typeof item === 'boolean' || typeof item === 'number')
-      return storageAccessorsInstance.set(key, item);
-    else if (typeof item !== 'string')
-      return storageAccessorsInstance.set(key, JSON.stringify(item));
-    else return storageAccessorsInstance.set(key, item);
+    const type = typeof item;
+    switch (type) {
+      case 'number': {
+        itemType = type;
+        return storageAccessorsInstance.set(key, item as number);
+      }
+      case 'boolean': {
+        itemType = type;
+        return storageAccessorsInstance.set(key, item as boolean);
+      }
+      case 'string': {
+        itemType = type;
+        return storageAccessorsInstance.set(key, item as string);
+      }
+      default: {
+        itemType = 'object';
+        return storageAccessorsInstance.set(key, JSON.stringify(item));
+      }
+    }
   };
   const retrieve = () => {
     try {
-      const string = storageAccessorsInstance.getString(key);
-      if (string) {
-        try {
-          return JSON.parse(string) as T;
-        } catch (error) {
-          return string as T;
+      switch (itemType) {
+        case 'number':
+          return storageAccessorsInstance.getNumber(key);
+        case 'boolean':
+          return storageAccessorsInstance.getBoolean(key);
+        case 'string':
+          return storageAccessorsInstance.getString(key);
+        default: {
+          const item = storageAccessorsInstance.getString(key);
+          if (item) {
+            try {
+              return JSON.parse(item) as T;
+            } catch (error) {
+              return item as T;
+            }
+          }
         }
       }
       return undefined;
     } catch (error) {
-      console.error($lf(35), error);
+      console.error($lf(63), error);
       return undefined;
     }
   };
@@ -46,10 +74,23 @@ export const createStorageAccessors = <T>(key: string) => {
   const useBoolean = () => useMMKVBoolean(key, storageAccessorsInstance);
   const useObject = () => useMMKVObject<T>(key, storageAccessorsInstance);
   const useBuffer = () => useMMKVBuffer(key, storageAccessorsInstance);
+  const use = () => {
+    switch (itemType) {
+      case 'number':
+        return useMMKVNumber(key, storageAccessorsInstance) as HookType<T>;
+      case 'boolean':
+        return useMMKVBoolean(key, storageAccessorsInstance) as HookType<T>;
+      case 'string':
+        return useMMKVString(key, storageAccessorsInstance) as HookType<T>;
+      default:
+        return useMMKVObject<T>(key, storageAccessorsInstance) as HookType<T>;
+    }
+  };
   return {
     store,
     retrieve,
     remove,
+    use,
     useString,
     useNumber,
     useBoolean,
@@ -59,6 +100,7 @@ export const createStorageAccessors = <T>(key: string) => {
 };
 
 export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
+  let itemType: 'string' | 'number' | 'boolean' | 'object' | undefined;
   const storedKeysKey = `#${baseKey}#`;
   const KEY = baseKey + '-';
   const keysDelimiter = '||';
@@ -78,34 +120,60 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
   const store = (keySuffix: string, item: T) => {
     const key = KEY + keySuffix;
     storeKey(key);
-    if (typeof item !== 'string')
-      return storageAccessorsInstance.set(key, JSON.stringify(item));
-    else return storageAccessorsInstance.set(key, item);
+    const type = typeof item;
+    switch (type) {
+      case 'number': {
+        itemType = type;
+        return storageAccessorsInstance.set(key, item as number);
+      }
+      case 'boolean': {
+        itemType = type;
+        return storageAccessorsInstance.set(key, item as boolean);
+      }
+      case 'string': {
+        itemType = type;
+        return storageAccessorsInstance.set(key, item as string);
+      }
+      default: {
+        itemType = 'object';
+        return storageAccessorsInstance.set(key, JSON.stringify(item));
+      }
+    }
   };
   const retrieve = (keySuffix: string) => {
     const key = KEY + keySuffix;
     try {
-      const string = storageAccessorsInstance.getString(key);
-      if (string) {
-        try {
-          return JSON.parse(string) as T;
-        } catch (error) {
-          return string as T;
+      switch (itemType) {
+        case 'number':
+          return storageAccessorsInstance.getNumber(key);
+        case 'boolean':
+          return storageAccessorsInstance.getBoolean(key);
+        case 'string':
+          return storageAccessorsInstance.getString(key);
+        default: {
+          const item = storageAccessorsInstance.getString(key);
+          if (item) {
+            try {
+              return JSON.parse(item) as T;
+            } catch (error) {
+              return item as T;
+            }
+          }
         }
       }
       return undefined;
     } catch (error) {
-      console.error($lf(98), error);
+      console.error($lf(166), error);
       return undefined;
     }
   };
   const retrieveAll = () => {
     const delimiter = keysDelimiter + KEY;
     const keys = retrieveKeys().split(delimiter);
-    const items: T[] = [];
+    const items: (BasicType | T)[] = [];
     for (const keySuffix of keys) {
       const item = retrieve(keySuffix);
-      if (item) items.push(item);
+      if (item !== undefined) items.push(item);
     }
     return items;
   };
@@ -133,10 +201,23 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
     useMMKVObject<T>(KEY + keySuffix, storageAccessorsInstance);
   const useBuffer = (keySuffix: string) =>
     useMMKVBuffer(KEY + keySuffix, storageAccessorsInstance);
+  const use = (keySuffix: string) => {
+    switch (itemType) {
+      //prettier-ignore
+      case 'number': return useMMKVNumber(KEY + keySuffix, storageAccessorsInstance) as HookType<T>;
+      //prettier-ignore
+      case 'boolean': return useMMKVBoolean(KEY + keySuffix, storageAccessorsInstance) as HookType<T>;
+      //prettier-ignore
+      case 'string': return useMMKVString(KEY + keySuffix, storageAccessorsInstance) as HookType<T>;
+      //prettier-ignore
+      default: return useMMKVObject<T>(KEY + keySuffix, storageAccessorsInstance) as HookType<T>;
+    }
+  };
   return {
     store,
     retrieve,
     retrieveAll,
+    use,
     remove,
     removeAll,
     useString,
