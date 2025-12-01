@@ -1,6 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import {
   View,
+  Animated as RNAnimated,
   ScrollView,
   type StyleProp,
   type ViewProps,
@@ -26,6 +27,7 @@ import Animated from 'react-native-reanimated';
 
 export type LayoutProps<Scrollable extends boolean | undefined = undefined> = {
   animated?: boolean;
+  animatedType?: 'react-native' | 'reanimated';
   animatedStyle?: StyleProp<AnimatedStyle<ViewStyle>>;
   skeleton?: { colors?: SkeletonLoadingIndicatorProps['colors'] } | boolean;
   loading?: LoadingIndicatorProps | boolean;
@@ -98,12 +100,22 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
   borderRadius,
   animated,
   animatedStyle,
+  animatedType = 'reanimated',
   style,
   ...props
 }: PropsWithChildren<LayoutProps<Scrollable>>) {
-  const ViewComponent = animated ? Animated.View : View;
-  const ScrollViewComponent = animated ? Animated.ScrollView : ScrollView;
-  const componentStyle = animated ? animatedStyle : style;
+  const ViewComponent = animated
+    ? animatedType === 'reanimated'
+      ? Animated.View
+      : RNAnimated.View
+    : View;
+  const ScrollViewComponent = animated
+    ? animatedType === 'reanimated'
+      ? Animated.ScrollView
+      : RNAnimated.ScrollView
+    : ScrollView;
+  const componentStyle =
+    animated && animatedType === 'reanimated' ? animatedStyle : style;
   const orientation = useDeviceOrientation();
   const viewStyle: ViewStyle = {
     ...transformSpacing({ margin, orientation }),

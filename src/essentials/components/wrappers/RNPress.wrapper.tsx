@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import type { GestureResponderEvent, ViewProps } from 'react-native';
-import { Animated as RNAnimated } from 'react-native';
+import { Animated } from 'react-native';
 import {
   snapShotGestureResponderEvent,
   wait,
@@ -43,8 +43,8 @@ export function RNPress({
   const activateRef = useRef(false);
   const moveCancelledRef = useRef(false);
 
-  const scale = useRef(new RNAnimated.Value(1)).current;
-  const opacity = useRef(new RNAnimated.Value(1)).current;
+  const scale = useRef(new Animated.Value(1)).current;
+  const opacity = useRef(new Animated.Value(1)).current;
 
   const touchStartPosition = useRef({ x: 0, y: 0 });
   const prevActivatedTime = useRef(0);
@@ -59,13 +59,13 @@ export function RNPress({
   const duration = 200;
 
   const pressIn = () => {
-    RNAnimated.parallel([
-      RNAnimated.timing(opacity, {
+    Animated.parallel([
+      Animated.timing(opacity, {
         toValue: activeOpacity || 0.9,
         duration,
         useNativeDriver: true,
       }),
-      RNAnimated.timing(scale, {
+      Animated.timing(scale, {
         toValue: 0.95,
         duration,
         useNativeDriver: true,
@@ -74,13 +74,13 @@ export function RNPress({
   };
 
   const pressOut = () => {
-    RNAnimated.parallel([
-      RNAnimated.timing(opacity, {
+    Animated.parallel([
+      Animated.timing(opacity, {
         toValue: 1,
         duration,
         useNativeDriver: true,
       }),
-      RNAnimated.timing(scale, {
+      Animated.timing(scale, {
         toValue: 1,
         duration,
         useNativeDriver: true,
@@ -96,7 +96,7 @@ export function RNPress({
   };
 
   return (
-    <RNAnimated.View
+    <Animated.View
       {...props}
       style={[style, disableAnimation ? {} : animatedStyle]}
       onTouchStart={(e) => {

@@ -1,11 +1,10 @@
 import { useRef } from 'react';
-import type { GestureResponderEvent } from 'react-native';
+import { Animated, type GestureResponderEvent } from 'react-native';
 import {
   snapShotGestureResponderEvent,
   wait,
   type GestureResponderNativeEventSnapshot,
 } from '../../utils';
-import { Animated } from 'react-native';
 import { Layout, type LayoutProps } from '../layouts';
 
 export interface RNPressableLayoutProps extends LayoutProps {
@@ -53,7 +52,7 @@ export function RNPressableLayout({
   const minDurationToActivateAgain = minDoubleTapProtectionDuration || 750;
 
   const animatedStyle = {
-    transform: [{ scale: scale }],
+    transform: [{ scale }],
     opacity: disabled ? 0.5 : opacity,
   };
   const duration = 200;
@@ -98,6 +97,8 @@ export function RNPressableLayout({
   return (
     <Layout
       {...props}
+      animated
+      animatedType="react-native"
       style={[style, disableAnimation ? {} : animatedStyle]}
       onTouchStart={(e) => {
         stopPropagation && e.stopPropagation();
