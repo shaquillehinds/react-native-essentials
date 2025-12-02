@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   MMKV,
   useMMKVBoolean,
@@ -12,12 +13,12 @@ export const storageAccessorsInstance = new MMKV({
   id: storageAccessorsInstanceID,
 });
 type BasicType = string | number | boolean;
-//prettier-ignore
-type HookType<T> = [T | undefined, (v: T | undefined | ((curr: T | undefined) => T | undefined)) => void];
+type SetAction<T> = T | undefined | ((curr: T | undefined) => T | undefined);
 
 export const createStorageAccessors = <T>(key: string) => {
   let itemType: 'string' | 'number' | 'boolean' | 'object' | undefined;
   const store = (item: T) => {
+    if (item === undefined) return storageAccessorsInstance.delete(key);
     const type = typeof item;
     switch (type) {
       case 'number': {
@@ -60,7 +61,7 @@ export const createStorageAccessors = <T>(key: string) => {
       }
       return undefined;
     } catch (error) {
-      console.error($lf(63), error);
+      console.error($lf(64), error);
       return undefined;
     }
   };
@@ -75,21 +76,25 @@ export const createStorageAccessors = <T>(key: string) => {
   const useObject = () => useMMKVObject<T>(key, storageAccessorsInstance);
   const useBuffer = () => useMMKVBuffer(key, storageAccessorsInstance);
   const use = () => {
-    switch (itemType) {
-      case 'number':
-        return useMMKVNumber(key, storageAccessorsInstance) as HookType<T>;
-      case 'boolean':
-        return useMMKVBoolean(key, storageAccessorsInstance) as HookType<T>;
-      case 'string':
-        return useMMKVString(key, storageAccessorsInstance) as HookType<T>;
-      case 'object':
-        return useMMKVObject<T>(key, storageAccessorsInstance) as HookType<T>;
-      //prettier-ignore
-      default: return [undefined, (v: T| ((curr: undefined) => T))=>{
-        if(typeof v === 'function') return store((v as (curr: undefined) => T)(undefined))
-        else return store(v)
-      }] as HookType<T>;
-    }
+    const [bump, setBump] = useState(0);
+    //prettier-ignore
+    const value = useMemo(() =>retrieve(), [storageAccessorsInstance, key, bump]);
+    const set = useCallback(
+      (v: T | SetAction<T>) => {
+        if (v === undefined) return storageAccessorsInstance.delete(key);
+        if (typeof v === 'function')
+          store((v as (curr: T | undefined) => T | undefined)(retrieve()) as T);
+        else store(v as T);
+      },
+      [key, storageAccessorsInstance]
+    );
+    useEffect(() => {
+      const listener = storageAccessorsInstance.addOnValueChangedListener(
+        (changedKey) => changedKey === key && setBump((b) => b + 1)
+      );
+      return () => listener.remove();
+    }, [key, storageAccessorsInstance]);
+    return [value, set] as const;
   };
   return {
     store,
@@ -109,13 +114,16 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
   const storedKeysKey = `#${baseKey}#`;
   const KEY = baseKey + '-';
   const keysDelimiter = '||';
+  const hasKey = (key: string) => retrieveKeys().includes(key);
   const retrieveKeys = () =>
     storageAccessorsInstance.getString(storedKeysKey) || '';
-  const storeKey = (key: string) =>
-    storageAccessorsInstance.set(
-      storedKeysKey,
-      retrieveKeys() + keysDelimiter + key
-    );
+  const storeKey = (key: string) => {
+    if (!hasKey(key))
+      storageAccessorsInstance.set(
+        storedKeysKey,
+        retrieveKeys() + keysDelimiter + key
+      );
+  };
   const removeKey = (key: string) =>
     storageAccessorsInstance.set(
       storedKeysKey,
@@ -124,6 +132,10 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
 
   const store = (keySuffix: string, item: T) => {
     const key = KEY + keySuffix;
+    if (item === undefined) {
+      removeKey(key);
+      return storageAccessorsInstance.delete(key);
+    }
     storeKey(key);
     const type = typeof item;
     switch (type) {
@@ -168,7 +180,7 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
       }
       return undefined;
     } catch (error) {
-      console.error($lf(171), error);
+      console.error($lf(182), error);
       return undefined;
     }
   };
@@ -207,22 +219,26 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
   const useBuffer = (keySuffix: string) =>
     useMMKVBuffer(KEY + keySuffix, storageAccessorsInstance);
   const use = (keySuffix: string) => {
-    switch (itemType) {
-      //prettier-ignore
-      case 'number': return useMMKVNumber(KEY + keySuffix, storageAccessorsInstance) as HookType<T>;
-      //prettier-ignore
-      case 'boolean': return useMMKVBoolean(KEY + keySuffix, storageAccessorsInstance) as HookType<T>;
-      //prettier-ignore
-      case 'string': return useMMKVString(KEY + keySuffix, storageAccessorsInstance) as HookType<T>;
-      //prettier-ignore
-      case 'object': return useMMKVObject<T>(KEY + keySuffix, storageAccessorsInstance) as HookType<T>;
-      //prettier-ignore
-      default: return [undefined, (v: T| ((curr: undefined) => T))=>{
-        const key = KEY + keySuffix;
-        if(typeof v === 'function') return store(key, (v as (curr: undefined) => T)(undefined))
-        else return store(key, v)
-      }] as HookType<T>;
-    }
+    const key = KEY + keySuffix;
+    const [bump, setBump] = useState(0);
+    //prettier-ignore
+    const value = useMemo(() =>retrieve(keySuffix), [storageAccessorsInstance, keySuffix, bump]);
+    const set = useCallback(
+      (v: T | SetAction<T>) => {
+        if (v === undefined) return storageAccessorsInstance.delete(key);
+        //prettier-ignore
+        if (typeof v === 'function')store(keySuffix, (v as (curr: T | undefined) => T | undefined)(retrieve(keySuffix)) as T);
+        else store(keySuffix, v as T);
+      },
+      [keySuffix, storageAccessorsInstance]
+    );
+    useEffect(() => {
+      const listener = storageAccessorsInstance.addOnValueChangedListener(
+        (changedKey) => changedKey === key && setBump((b) => b + 1)
+      );
+      return () => listener.remove();
+    }, [key, storageAccessorsInstance]);
+    return [value, set] as const;
   };
   return {
     store,
