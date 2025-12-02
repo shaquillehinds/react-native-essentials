@@ -41,6 +41,35 @@ export const createStorageAccessors = <T>(key: string) => {
   };
   const retrieve = () => {
     try {
+      if (!itemType) {
+        if (!storageAccessorsInstance.contains(key)) return undefined;
+        let storedValue: BasicType | Record<any, any> | undefined =
+          storageAccessorsInstance.getString(key);
+        if (storedValue) {
+          //prettier-ignore
+          try {storedValue = JSON.parse(storedValue);} catch (error) {
+            itemType = 'string';
+            return storedValue as T;
+          }
+          const determinedType = typeof storedValue;
+          if (determinedType === 'undefined' || determinedType === 'function')
+            return undefined;
+          //prettier-ignore
+          itemType = determinedType === 'bigint'? 'number' : determinedType === 'symbol'? 'string': determinedType;
+          return storedValue as T;
+        }
+        storedValue = storageAccessorsInstance.getBoolean(key);
+        if (storedValue) {
+          itemType = 'boolean';
+          return storedValue as T;
+        }
+        storedValue = storageAccessorsInstance.getNumber(key);
+        if (storedValue) {
+          itemType = 'number';
+          return storedValue as T;
+        }
+        return undefined;
+      }
       switch (itemType) {
         case 'number':
           return storageAccessorsInstance.getNumber(key) as T | undefined;
@@ -57,11 +86,11 @@ export const createStorageAccessors = <T>(key: string) => {
               return item as T;
             }
           }
+          return undefined;
         }
       }
-      return undefined;
     } catch (error) {
-      console.error($lf(64), error);
+      console.error($lf(93), error);
       return undefined;
     }
   };
@@ -160,6 +189,35 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
   const retrieve = (keySuffix: string) => {
     const key = KEY + keySuffix;
     try {
+      if (!itemType) {
+        if (!storageAccessorsInstance.contains(key)) return undefined;
+        let storedValue: BasicType | Record<any, any> | undefined =
+          storageAccessorsInstance.getString(key);
+        if (storedValue) {
+          //prettier-ignore
+          try {storedValue = JSON.parse(storedValue);} catch (error) {
+            itemType = 'string';
+            return storedValue as T;
+          }
+          const determinedType = typeof storedValue;
+          if (determinedType === 'undefined' || determinedType === 'function')
+            return undefined;
+          //prettier-ignore
+          itemType = determinedType === 'bigint'? 'number' : determinedType === 'symbol'? 'string': determinedType;
+          return storedValue as T;
+        }
+        storedValue = storageAccessorsInstance.getBoolean(key);
+        if (storedValue) {
+          itemType = 'boolean';
+          return storedValue as T;
+        }
+        storedValue = storageAccessorsInstance.getNumber(key);
+        if (storedValue) {
+          itemType = 'number';
+          return storedValue as T;
+        }
+        return undefined;
+      }
       switch (itemType) {
         case 'number':
           return storageAccessorsInstance.getNumber(key) as T | undefined;
@@ -180,7 +238,7 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
       }
       return undefined;
     } catch (error) {
-      console.error($lf(182), error);
+      console.error($lf(241), error);
       return undefined;
     }
   };
