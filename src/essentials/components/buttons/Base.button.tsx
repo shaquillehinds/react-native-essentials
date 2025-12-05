@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import { View, type ViewStyle } from 'react-native';
+import { ActivityIndicator, View, type ViewStyle } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { ArcSpinnerAnimation } from '../../animations/ArcSpinner.animation';
 import { useDeviceOrientation, useFontSizes } from '../../hooks';
@@ -98,10 +98,7 @@ export function BaseButton({
         </View>
         {loading ? (
           <View style={loadingContainerStyle}>
-            <ArcSpinnerAnimation
-              size={fontSizes[fSize] * 1.3}
-              color={customFontColor}
-            />
+            <ActivityIndicator size="small" color={customFontColor} />
           </View>
         ) : null}
       </ViewComponent>
