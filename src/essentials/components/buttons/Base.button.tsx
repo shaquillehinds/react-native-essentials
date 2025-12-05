@@ -1,7 +1,6 @@
 import type { PropsWithChildren } from 'react';
 import { ActivityIndicator, View, type ViewStyle } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { ArcSpinnerAnimation } from '../../animations/ArcSpinner.animation';
 import { useDeviceOrientation, useFontSizes } from '../../hooks';
 import { transformSpacing } from '../../styles';
 import {
