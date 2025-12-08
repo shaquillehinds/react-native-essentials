@@ -47,7 +47,7 @@
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "clean": "del-cli lib",
     "prepare": "bob build",
-    "postinstall": "node -e \"try{require('./scripts/install-peers.js')}catch(e){console.log(e)}}\"",
+    "postinstall": "node -e \"try{require('./scripts/install-peers.js')}catch(e){console.log(e)}\"",
     "release": "release-it"
   },
   "keywords": [
