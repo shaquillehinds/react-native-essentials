@@ -21,7 +21,7 @@ const DEPENDENCIES: DependencyCheck[] = [
     packageName: 'react-native-safe-area-context',
     required: true,
   },
-  { name: 'MMKV', packageName: 'react-native-mmkv', required: false },
+  { name: 'MMKV', packageName: 'react-native-mmkv', required: true },
   { name: 'SVG', packageName: 'react-native-svg', required: true },
 ];
 
