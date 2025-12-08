@@ -95,6 +95,9 @@
   "resolutions": {
     "@types/react": "^18.2.44"
   },
+  "dependencies": {
+    "eventemitter3": "^5.0.1"
+  },
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
@@ -193,8 +196,5 @@
     "languages": "js",
     "type": "library",
     "version": "0.48.5"
-  },
-  "dependencies": {
-    "eventemitter3": "^5.0.1"
   }
 }
