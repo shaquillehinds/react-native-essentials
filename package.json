@@ -85,10 +85,7 @@
     "react-native": "0.76.7",
     "react-native-builder-bob": "^0.38.0",
     "react-native-gesture-handler": "^2.27.1",
-    "react-native-mmkv": "^3.3.0",
     "react-native-reanimated": "^3.18.0",
-    "react-native-safe-area-context": "^5.4.0",
-    "react-native-svg": "^15.12.0",
     "release-it": "^17.10.0",
     "typescript": "^5.2.2"
   },
@@ -98,9 +95,9 @@
   "dependencies": {
     "eventemitter3": "^5.0.1",
     "react-native-mmkv": "^4.1.0",
+    "react-native-nitro-modules": "^0.31.10",
     "react-native-safe-area-context": "^5.6.2",
-    "react-native-svg": "^15.15.1",
-    "react-native-nitro-modules": "^0.31.10"
+    "react-native-svg": "^15.15.1"
   },
   "peerDependencies": {
     "react": "*",
@@ -109,13 +106,13 @@
     "react-native-reanimated": ">=3.0.0"
   },
   "peerDependenciesMeta": {
-    "react-native-nitro-modules": {
-      "optional": false
-    },
     "react-native-gesture-handler": {
       "optional": false
     },
     "react-native-mmkv": {
+      "optional": false
+    },
+    "react-native-nitro-modules": {
       "optional": false
     },
     "react-native-reanimated": {

@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  MMKV,
   useMMKVBoolean,
   useMMKVBuffer,
   useMMKVNumber,
   useMMKVObject,
   useMMKVString,
+  createMMKV,
 } from 'react-native-mmkv';
 
 export const storageAccessorsInstanceID = 'rne-csa';
-export const storageAccessorsInstance = new MMKV({
+export const storageAccessorsInstance = createMMKV({
   id: storageAccessorsInstanceID,
 });
 type BasicType = string | number | boolean;
@@ -18,7 +18,7 @@ type SetAction<T> = T | undefined | ((curr: T | undefined) => T | undefined);
 export const createStorageAccessors = <T>(key: string) => {
   let itemType: 'string' | 'number' | 'boolean' | 'object' | undefined;
   const store = (item: T) => {
-    if (item === undefined) return storageAccessorsInstance.delete(key);
+    if (item === undefined) return storageAccessorsInstance.remove(key);
     const type = typeof item;
     switch (type) {
       case 'number': {
@@ -96,7 +96,7 @@ export const createStorageAccessors = <T>(key: string) => {
   };
   const remove = () => {
     const item = retrieve();
-    storageAccessorsInstance.delete(key);
+    storageAccessorsInstance.remove(key);
     return item;
   };
   const useString = () => useMMKVString(key, storageAccessorsInstance);
@@ -110,7 +110,10 @@ export const createStorageAccessors = <T>(key: string) => {
     const value = useMemo(() =>retrieve(), [storageAccessorsInstance, key, bump]);
     const set = useCallback(
       (v: T | SetAction<T>) => {
-        if (v === undefined) return storageAccessorsInstance.delete(key);
+        if (v === undefined) {
+          storageAccessorsInstance.remove(key);
+          return;
+        }
         if (typeof v === 'function')
           store((v as (curr: T | undefined) => T | undefined)(retrieve()) as T);
         else store(v as T);
@@ -163,7 +166,7 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
     const key = KEY + keySuffix;
     if (item === undefined) {
       removeKey(key);
-      return storageAccessorsInstance.delete(key);
+      return storageAccessorsInstance.remove(key);
     }
     storeKey(key);
     const type = typeof item;
@@ -238,7 +241,7 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
       }
       return undefined;
     } catch (error) {
-      console.error($lf(241), error);
+      console.error($lf(244), error);
       return undefined;
     }
   };
@@ -256,14 +259,14 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
     const key = KEY + keySuffix;
     removeKey(key);
     const item = retrieve(keySuffix);
-    storageAccessorsInstance.delete(key);
+    storageAccessorsInstance.remove(key);
     return item;
   };
   const removeAll = () => {
     const delimiter = keysDelimiter + KEY;
     const keys = retrieveKeys().split(delimiter);
     for (const keySuffix of keys) {
-      keySuffix && storageAccessorsInstance.delete(KEY + keySuffix);
+      keySuffix && storageAccessorsInstance.remove(KEY + keySuffix);
     }
   };
   const useString = (keySuffix: string) =>
@@ -283,7 +286,10 @@ export const createStorageAccessorsDynamic = <T>(baseKey: string) => {
     const value = useMemo(() =>retrieve(keySuffix), [storageAccessorsInstance, keySuffix, bump]);
     const set = useCallback(
       (v: T | SetAction<T>) => {
-        if (v === undefined) return storageAccessorsInstance.delete(key);
+        if (v === undefined) {
+          storageAccessorsInstance.remove(key);
+          return;
+        }
         //prettier-ignore
         if (typeof v === 'function')store(keySuffix, (v as (curr: T | undefined) => T | undefined)(retrieve(keySuffix)) as T);
         else store(keySuffix, v as T);
