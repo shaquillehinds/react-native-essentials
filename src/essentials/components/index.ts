@@ -6,3 +6,5 @@ export * from './wrappers';
 export * from './inputs';
 export * from './indicators';
 export * from './injectors';
+export * from './utilities';
+export * from './icons';

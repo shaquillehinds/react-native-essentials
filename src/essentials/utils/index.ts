@@ -12,3 +12,4 @@ export * from './LanguageCodes';
 export * from './mergeStringRecords';
 export * from './mergeLanguagesRecords';
 export * from './checkDependencies';
+export * from './strToNumPercentage';
