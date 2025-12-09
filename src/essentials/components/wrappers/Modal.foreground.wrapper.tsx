@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import { maxZIndex } from '../../styles';
 import { type PropsWithChildren } from 'react';
-import { isIOS } from '@shaquillehinds/react-native-essentials';
+import { isIOS } from '../../constants/device.const';
 
 /**
  * @description Very important your animated views are wrapped in a regular react native view

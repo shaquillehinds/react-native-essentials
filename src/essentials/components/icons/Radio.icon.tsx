@@ -1,7 +1,5 @@
-import {
-  Layout,
-  type BorderSize,
-} from '@shaquillehinds/react-native-essentials';
+import type { BorderSize } from '../buttons';
+import { Layout } from '../layouts';
 
 export function RadioIcon({
   isSelected = false,

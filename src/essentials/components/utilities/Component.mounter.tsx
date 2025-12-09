@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Scheduler } from '@shaquillehinds/react-native-essentials';
+import { Scheduler } from '../../utils';
 
 export type ComponentMounterProps = {
   showComponent?: boolean;
