@@ -1,6 +1,9 @@
-import { ViewDimensionsInjector } from '../injectors/ViewDimensions.injector';
-import { View, type StyleProp, type ViewStyle } from 'react-native';
-import { ArcSpinnerAnimation } from '../../animations/ArcSpinner.animation';
+import {
+  ActivityIndicator,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 
 export type LoadingIndicatorProps = {
   TopComponent?: React.JSX.Element;
@@ -28,16 +31,12 @@ export function LoadingIndicator({
     backgroundColor: backgroundColor,
     opacity,
   };
+  if (absolute) containerStyle.position = 'absolute';
   return (
-    <ViewDimensionsInjector
-      absolute={absolute}
-      renderItem={(d) => (
-        <View style={containerStyle}>
-          {TopComponent}
-          <ArcSpinnerAnimation size={d.width / 4} color={animationColor} />
-          {BottomComponent}
-        </View>
-      )}
-    />
+    <View style={containerStyle}>
+      {TopComponent}
+      <ActivityIndicator size={'large'} color={animationColor} />
+      {BottomComponent}
+    </View>
   );
 }
