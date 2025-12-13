@@ -7,12 +7,14 @@ export function RadioIcon({
   unSelectedColor = '#D9D9D9',
   size = 2,
   borderWidth = 'medium',
+  alwaysShowCenter = false,
 }: {
   isSelected?: boolean;
   selectedColor?: string;
   unSelectedColor?: string;
   size?: number;
   borderWidth?: BorderSize;
+  alwaysShowCenter?: boolean;
 }) {
   return (
     <Layout
@@ -23,11 +25,13 @@ export function RadioIcon({
       borderWidth={borderWidth}
       borderColor={isSelected ? selectedColor : unSelectedColor}
     >
-      <Layout
-        square={size / 2.5}
-        borderRadius="full"
-        backgroundColor={isSelected ? selectedColor : unSelectedColor}
-      />
+      {(alwaysShowCenter || isSelected) && (
+        <Layout
+          square={size / 2.5}
+          borderRadius="full"
+          backgroundColor={isSelected ? selectedColor : unSelectedColor}
+        />
+      )}
     </Layout>
   );
 }
