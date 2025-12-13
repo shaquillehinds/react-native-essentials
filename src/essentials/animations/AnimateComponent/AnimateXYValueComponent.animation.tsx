@@ -13,7 +13,17 @@ export function AnimateXYValueComponent(
   const animatedValue = useRef(
     new Animated.ValueXY(props.initialPosition)
   ).current;
-
+  const inputRange = useMemo(() => {
+    if (Array.isArray(props.toPosition)) {
+      if (props.toPosition[0]?.type === 'decay') return [];
+      return props.toPosition.filterMap((config) =>
+        config.type !== 'decay' ? (config.toValue as XYNumber) : undefined
+      );
+    } else {
+      if (props.toPosition.type === 'decay') return [];
+      return [props.initialPosition, props.toPosition.toValue as XYNumber];
+    }
+  }, []);
   useEffect(() => {
     if (!Array.isArray(props.toPosition)) {
       let composition: Animated.CompositeAnimation | null = null;
@@ -109,7 +119,7 @@ export function AnimateXYValueComponent(
     value: animatedValue,
   }));
 
-  const style = useMemo(() => props.style(animatedValue), []);
+  const style = useMemo(() => props.style(animatedValue, { inputRange }), []);
   return <Animated.View style={style}>{props.children}</Animated.View>;
 }
 
