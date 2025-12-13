@@ -1,39 +1,50 @@
 import { useEffect, useImperativeHandle, useMemo, useRef } from 'react';
-import { Animated, useAnimatedValue } from 'react-native';
+import { Animated } from 'react-native';
 import type {
   AnimateComponentAnimationConfig,
   AnimateComponentProps,
 } from './AnimateComponent.types';
+import { useAnimatedStringValue } from '../../hooks/useAnimatedStringValue';
+import { stringArrayToNormalizedNumberArray } from '../../algorithms';
 
-export function AnimateValueComponent(
-  props: AnimateComponentProps<number, false, false>
+export function AnimateStringValueComponent(
+  props: AnimateComponentProps<string, true, true>
 ) {
   const compositionRef = useRef<Animated.CompositeAnimation | null>(null);
-  const animatedValue = useAnimatedValue(props.initialPosition, {
-    useNativeDriver: true,
-  });
-  const inputRange = useMemo(() => {
-    if (Array.isArray(props.toPosition)) {
-      if (props.toPosition[0]?.type === 'decay') return [];
-      return props.toPosition.filterMap((config) =>
-        config.type !== 'decay' ? (config.toValue as number) : undefined
-      );
-    } else {
-      if (props.toPosition.type === 'decay') return [];
-      return [props.initialPosition, props.toPosition.toValue as number];
+  const toPosition = props.toPosition;
+  const initialInputRange = Array.isArray(toPosition)
+    ? stringArrayToNormalizedNumberArray([
+        props.initialPosition,
+        ...toPosition.map((config) => config.toValue as unknown as string),
+      ])
+    : [0, 1];
+  const initialOutputRange = Array.isArray(toPosition)
+    ? [
+        props.initialPosition,
+        ...toPosition.map((config) => config.toValue as unknown as string),
+      ]
+    : [props.initialPosition, toPosition.toValue as unknown as string];
+  const { value: animatedValue, interpolatedValue } = useAnimatedStringValue(
+    initialInputRange,
+    initialOutputRange,
+    {
+      useNativeDriver: true,
     }
-  }, []);
+  );
   useEffect(() => {
     if (!Array.isArray(props.toPosition)) {
       let composition: Animated.CompositeAnimation | null = null;
       const config = props.toPosition;
-      composition = animationSwitcher(animatedValue, config)!;
-      if (props.returnToStart && config.type !== 'decay')
+      composition = animationSwitcher(
+        animatedValue,
+        config as AnimateComponentAnimationConfig<false, false>
+      )!;
+      if (props.returnToStart)
         composition = Animated.sequence([
           composition,
           animationSwitcher(animatedValue, {
             ...config,
-            toValue: props.initialPosition,
+            toValue: 0,
           })!,
         ]);
       if (props.loop)
@@ -46,13 +57,16 @@ export function AnimateValueComponent(
         let composition: Animated.CompositeAnimation | null = null;
         if (length === 1 && props.toPosition[0]) {
           const firstConfig = props.toPosition[0];
-          composition = animationSwitcher(animatedValue, firstConfig)!;
-          if (props.returnToStart && firstConfig.type !== 'decay')
+          composition = animationSwitcher(
+            animatedValue,
+            firstConfig as AnimateComponentAnimationConfig<false, false>
+          )!;
+          if (props.returnToStart)
             composition = Animated.sequence([
               composition,
               animationSwitcher(animatedValue, {
                 ...firstConfig,
-                toValue: props.initialPosition,
+                toValue: 0,
               })!,
             ]);
           if (props.loop)
@@ -62,7 +76,10 @@ export function AnimateValueComponent(
         } else {
           composition = Animated.sequence([
             ...props.toPosition.filterMap((config) =>
-              animationSwitcher(animatedValue, config)
+              animationSwitcher(
+                animatedValue,
+                config as AnimateComponentAnimationConfig<false, false>
+              )
             ),
           ]);
           if (props.loop)
@@ -84,41 +101,40 @@ export function AnimateValueComponent(
       compositionRef.current?.stop();
       if (!Array.isArray(props.toPosition)) {
         const config = props.toPosition;
-        if (config.type !== 'decay')
-          animationSwitcher(animatedValue, {
-            ...config,
-            toValue: props.initialPosition,
-          }).start();
+        animationSwitcher(animatedValue, {
+          ...config,
+          toValue: 0,
+        }).start();
       } else {
         const length = props.toPosition.length;
         if (props.toPosition.length) {
           if (length === 1 && props.toPosition[0]) {
             const firstConfig = props.toPosition[0];
-            if (firstConfig.type !== 'decay')
-              animationSwitcher(animatedValue, {
-                ...firstConfig,
-                toValue: props.initialPosition,
-              }).start();
+            animationSwitcher(animatedValue, {
+              ...firstConfig,
+              toValue: 0,
+            }).start();
           } else {
             Animated.sequence([
               ...props.toPosition.filterMap((config) => {
-                if (config.type !== 'decay')
-                  return animationSwitcher(animatedValue, {
-                    ...config,
-                    toValue: props.initialPosition,
-                  });
-                return undefined;
+                return animationSwitcher(animatedValue, {
+                  ...config,
+                  toValue: 0,
+                });
               }),
             ]);
           }
         }
       }
     },
-    setValue: (value: number) => animatedValue.setValue(value),
-    value: animatedValue,
+    value: interpolatedValue,
+    setValue: undefined,
   }));
 
-  const style = useMemo(() => props.style(animatedValue, { inputRange }), []);
+  const style = useMemo(
+    () => props.style(interpolatedValue, { inputRange: initialInputRange }),
+    []
+  );
   return <Animated.View style={style}>{props.children}</Animated.View>;
 }
 

@@ -22,3 +22,4 @@ export * from './useFontSizes';
 export * from './useDebounce';
 export * from './useInterval';
 export * from './useTranslation';
+export * from './useAnimatedStringValue';

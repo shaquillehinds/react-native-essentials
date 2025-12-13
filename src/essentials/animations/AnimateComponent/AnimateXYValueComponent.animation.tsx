@@ -7,7 +7,7 @@ import type {
 } from './AnimateComponent.types';
 
 export function AnimateXYValueComponent(
-  props: AnimateComponentProps<XYNumber>
+  props: AnimateComponentProps<XYNumber, false, false>
 ) {
   const compositionRef = useRef<Animated.CompositeAnimation | null>(null);
   const animatedValue = useRef(

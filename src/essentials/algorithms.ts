@@ -155,6 +155,26 @@ export function hexOpacity(percentage: number): string {
   return hexPercentage;
 }
 
+export function normalizeNumberArray(numbers: number[]): number[] {
+  if (numbers.length === 0) return [];
+  const min = Math.min(...numbers);
+  const max = Math.max(...numbers);
+  if (min === max) return numbers.map(() => 0.5);
+  const range = max - min;
+  return numbers.map((num) => (num - min) / range);
+}
+export function stringArrayToNormalizedNumberArray(
+  strings: string[]
+): number[] {
+  return normalizeNumberArray(
+    strings.map((string, index) => {
+      const number = parseFloat(string);
+      if (isNaN(number)) return index;
+      return number;
+    })
+  );
+}
+
 export function secondsToTime(
   secs: number,
   props?: { hideSeconds?: boolean; hideHours?: boolean }
