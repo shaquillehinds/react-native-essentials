@@ -6,3 +6,4 @@ export * from './RNPressableLayout.wrapper';
 export * from './Modal.background.animated';
 export * from './Modal.foreground.wrapper';
 export * from './Modal.wrapper';
+export * from './IsolateDependant.wrapper';
