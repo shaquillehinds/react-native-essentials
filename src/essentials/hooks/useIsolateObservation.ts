@@ -20,23 +20,26 @@ export type IsolateObserve<T extends IsolateObservables> = () => {
   observables: T;
   stopObserving: () => void;
 };
-export type IsolateRefObject<T extends IsolateObservables> = {
+export type IsolateRefData<T extends IsolateObservables> = {
   observe: IsolateObserve<T>;
   get: <K extends keyof T>(key: K) => T[K];
 };
+export type IsolateRefObject<T extends IsolateObservables> = React.RefObject<
+  IsolateRefData<T>
+>;
 export type IsolateRef<T extends IsolateObservables> = React.Ref<
-  IsolateRefObject<T>
+  IsolateRefData<T>
 >;
 
 export function useIsolateRef<
   T extends IsolateObservables = IsolateObservables,
 >() {
-  const ref = useRef<IsolateRefObject<T>>(null);
+  const ref = useRef<IsolateRefData<T>>(null);
   return ref;
 }
 export function useIsolateObservation<
   T extends IsolateObservables = IsolateObservables,
->(ref: React.Ref<IsolateRefObject<T>>, observables: T) {
+>(ref: React.Ref<IsolateRefData<T>>, observables: T) {
   const emitter = useRef(new EventEmitter());
   const previousRef = useRef(observables);
   const keys = Object.keys(observables);
