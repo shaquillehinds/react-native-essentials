@@ -24,9 +24,8 @@ export type IsolateRefData<T extends IsolateObservables> = {
   observe: IsolateObserve<T>;
   get: <K extends keyof T>(key: K) => T[K];
 };
-export type IsolateRefObject<T extends IsolateObservables> = React.RefObject<
-  IsolateRefData<T>
->;
+export type IsolateRefObject<T extends IsolateObservables> =
+  React.RefObject<IsolateRefData<T> | null>;
 export type IsolateRef<T extends IsolateObservables> = React.Ref<
   IsolateRefData<T>
 >;
