@@ -21,7 +21,7 @@ export type IsolateObserve<T extends IsolateObservables> = () => {
   stopObserving: () => void;
 };
 export type IsolateRefData<T extends IsolateObservables> = {
-  observe: IsolateObserve<T>;
+  useObservation: IsolateObserve<T>;
   get: <K extends keyof T>(key: K) => T[K];
 };
 export type IsolateRefObject<T extends IsolateObservables> =
@@ -36,14 +36,14 @@ export function useIsolateRef<
   const ref = useRef<IsolateRefData<T>>(null);
   return ref;
 }
-export function useIsolateObservation<
+export function useIsolateObservables<
   T extends IsolateObservables = IsolateObservables,
 >(ref: React.Ref<IsolateRefData<T>>, observables: T) {
   const emitter = useRef(new EventEmitter());
   const previousRef = useRef(observables);
   const keys = Object.keys(observables);
   const deps = Object.values(observables);
-  const observe = useCallback((subscribeTo?: (keyof T)[]) => {
+  const useObservation = useCallback((subscribeTo?: (keyof T)[]) => {
     const [isolateState, setIsolateState] = useState(observables);
     const updateFunction = (data: UpdatedIsolateObservables<T>) => {
       if (subscribeTo) {
@@ -71,8 +71,8 @@ export function useIsolateObservation<
   }, deps);
   useImperativeHandle(
     ref,
-    () => ({ observe, get: (key) => observables[key] }),
+    () => ({ useObservation, get: (key) => observables[key] }),
     [observables]
   );
-  return observe;
+  return useObservation;
 }

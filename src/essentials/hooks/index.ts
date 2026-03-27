@@ -23,4 +23,4 @@ export * from './useDebounce';
 export * from './useInterval';
 export * from './useTranslation';
 export * from './useAnimatedStringValue';
-export * from './useIsolateObservation';
+export * from './useIsolateObservables';
