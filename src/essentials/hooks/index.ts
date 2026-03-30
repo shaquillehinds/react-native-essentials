@@ -24,3 +24,4 @@ export * from './useInterval';
 export * from './useTranslation';
 export * from './useAnimatedStringValue';
 export * from './useIsolateObservables';
+export * from './useTimeout';

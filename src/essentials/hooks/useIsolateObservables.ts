@@ -17,7 +17,9 @@ export type UpdatedIsolateObservables<
   changed: U;
 };
 export type IsolateObserve<T extends IsolateObservables = IsolateObservables> =
-  (subscribeTo?: (keyof T)[]) => {
+  (subscribeTo?: {
+    [K in keyof T]: ((value: T[K]) => boolean) | boolean;
+  }) => {
     observables: T;
     stopObservation: () => void;
   };
@@ -40,7 +42,15 @@ export function useIsolateRef<
 
 export function useIsolateObservables<
   T extends IsolateObservables = IsolateObservables,
->(ref: React.Ref<IsolateRefData<T>>, observables: T, isObserving = true) {
+>({
+  ref,
+  observables,
+  isObserving,
+}: {
+  ref: React.Ref<IsolateRefData<T>>;
+  observables: T;
+  isObserving?: boolean;
+}) {
   const [observing, setObserving] = useState(isObserving);
 
   const emitter = useRef(new EventEmitter());
@@ -74,17 +84,26 @@ export function useIsolateObservables<
   }, []);
 
   const useObservation: IsolateObserve<T> = useCallback(
-    (subscribeTo?: (keyof T)[]) => {
+    (subscribeTo?: {
+      [K in keyof T]: ((value: T[K]) => boolean) | boolean;
+    }) => {
       const [isolateState, setIsolateState] = useState<T>(
         () => snapshotRef.current
       );
 
       const handleUpdate = useCallback((data: UpdatedIsolateObservables<T>) => {
         const shouldUpdate = subscribeTo
-          ? subscribeTo.some((key) => data.changed[key as string])
+          ? Object.keys(subscribeTo).some((key) => {
+              const filter = subscribeTo[key];
+              if (!filter) return false;
+              if (!data.changed[key]) return false;
+              if (typeof filter === 'function')
+                return filter(data.observables[key] as T[string]);
+              return true;
+            })
           : true;
-
-        if (shouldUpdate) setIsolateState(data.observables);
+        if (!shouldUpdate) return;
+        setIsolateState(data.observables);
       }, []);
 
       useEffect(() => {
