@@ -26,12 +26,14 @@ export function BaseButton({
   disabled,
   margin,
   customFontColor,
-  leftComponent,
   onPress,
   activeOpacity,
   textStyle,
   children,
+  leftComponent,
+  leftComponentGap,
   rightComponent,
+  rightComponentGap,
   style,
   fontStyle,
   ...rest
@@ -86,6 +88,10 @@ export function BaseButton({
           {leftComponent}
           <BaseText
             {...rest}
+            style={{
+              marginRight: rightComponentGap,
+              marginLeft: leftComponentGap,
+            }}
             customColor={customFontColor}
             fontSize={fSize}
             fontStyle={fontStyle || 'Medium'}

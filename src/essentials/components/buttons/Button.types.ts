@@ -33,4 +33,6 @@ export interface ButtonProps extends Omit<BaseTextProps, 'style'> {
   style?: StyleProp<AnimatedStyle<StyleProp<ViewStyle>>>;
   rightComponent?: JSX.Element;
   leftComponent?: JSX.Element;
+  rightComponentGap?: number;
+  leftComponentGap?: number;
 }
