@@ -1,5 +1,9 @@
 import { useRef } from 'react';
-import type { GestureResponderEvent, ViewProps } from 'react-native';
+import {
+  TouchableOpacity,
+  type GestureResponderEvent,
+  type ViewProps,
+} from 'react-native';
 import Animated, {
   useAnimatedStyle,
   withSpring,
@@ -24,6 +28,7 @@ export interface PressProps extends ViewProps {
   stopPropagation?: boolean;
   preventDefault?: boolean;
   persist?: boolean;
+  enableRapidPress?: boolean;
   disableDoubleTapProtection?: boolean;
   minDoubleTapProtectionDuration?: number;
 }
@@ -40,6 +45,7 @@ export function Press({
   stopPropagation,
   preventDefault,
   persist,
+  enableRapidPress,
   disableDoubleTapProtection,
   minDoubleTapProtectionDuration,
   ...props
@@ -52,7 +58,7 @@ export function Press({
 
   const touchStartPosition = useRef({ x: 0, y: 0 });
   const prevActivatedTime = useRef(0);
-  const longPressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const longPressTimeoutRef = useRef<number | null>(null);
 
   const minDurationToActivateAgain = minDoubleTapProtectionDuration || 750;
 
@@ -68,6 +74,20 @@ export function Press({
       activateRef.current = false;
     }, 50);
   };
+
+  if (enableRapidPress) {
+    return (
+      <TouchableOpacity
+        {...props}
+        style={style}
+        disabled={disabled}
+        activeOpacity={activeOpacity}
+        onPress={onPress}
+        //@ts-ignore
+        onLongPress={onLongPress}
+      />
+    );
+  }
 
   return (
     <Animated.View
