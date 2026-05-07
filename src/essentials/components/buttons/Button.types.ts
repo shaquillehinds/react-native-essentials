@@ -20,6 +20,7 @@ export type RadiusSize =
 export type ButtonSize = 'small' | 'large' | 'medium' | 'auto' | 'wide';
 
 export interface ButtonProps extends Omit<BaseTextProps, 'style'> {
+  enableRapidPress?: boolean;
   loading?: LoadingIndicatorProps | boolean;
   borderColor?: string;
   borderRadius?: RadiusSize;

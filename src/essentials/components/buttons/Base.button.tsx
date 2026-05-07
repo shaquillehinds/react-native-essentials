@@ -36,6 +36,7 @@ export function BaseButton({
   rightComponentGap,
   style,
   fontStyle,
+  enableRapidPress,
   ...rest
 }: PropsWithChildren<ButtonProps>) {
   const orientation = useDeviceOrientation();
@@ -74,6 +75,7 @@ export function BaseButton({
   const fSize = fontSize || sizes.fontSize;
   return (
     <Press
+      enableRapidPress={enableRapidPress}
       activeOpacity={disabled ? 0.5 : activeOpacity || 0.8}
       style={{
         ...transformSpacing({ margin, orientation }),
