@@ -58,7 +58,7 @@ export function Press({
 
   const touchStartPosition = useRef({ x: 0, y: 0 });
   const prevActivatedTime = useRef(0);
-  const longPressTimeoutRef = useRef<number | null>(null);
+  const longPressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const minDurationToActivateAgain = minDoubleTapProtectionDuration || 750;
 
