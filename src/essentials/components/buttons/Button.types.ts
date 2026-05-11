@@ -1,12 +1,12 @@
-import { type AnimatedStyle } from 'react-native-reanimated';
-import type { BaseTextProps } from '../typography';
 import type {
   FlexAlignType,
   StyleProp,
   TextStyle,
   ViewStyle,
 } from 'react-native';
+import { type AnimatedStyle } from 'react-native-reanimated';
 import type { LoadingIndicatorProps } from '../indicators';
+import type { BaseTextProps } from '../typography';
 
 export type BorderSize = 'razor' | 'thin' | 'medium' | 'large';
 export type RadiusSize =
@@ -23,9 +23,9 @@ export interface ButtonProps extends Omit<BaseTextProps, 'style'> {
   enableRapidPress?: boolean;
   loading?: LoadingIndicatorProps | boolean;
   borderColor?: string;
-  borderRadius?: RadiusSize;
+  borderRadius?: RadiusSize | number;
   borderWidth?: BorderSize;
-  backgroundColor?: string;
+  backgroundColor?: string | string[];
   activeOpacity?: number;
   customFontColor?: string;
   buttonSize?: ButtonSize;
@@ -36,4 +36,7 @@ export interface ButtonProps extends Omit<BaseTextProps, 'style'> {
   leftComponent?: JSX.Element;
   rightComponentGap?: number;
   leftComponentGap?: number;
+  gradientOpacities?: number[];
+  gradientStart?: { x: number | string; y: number | string };
+  gradientEnd?: { x: number | string; y: number | string };
 }

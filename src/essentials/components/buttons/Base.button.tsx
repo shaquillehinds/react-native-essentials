@@ -11,6 +11,7 @@ import {
 import { BaseText } from '../typography';
 import { Press } from '../wrappers';
 import type { ButtonProps } from './Button.types';
+import { AbsoluteLinearGradient } from '../../svgs';
 
 export function BaseButton({
   buttonSize,
@@ -37,28 +38,41 @@ export function BaseButton({
   style,
   fontStyle,
   enableRapidPress,
+  gradientEnd,
+  gradientStart,
+  gradientOpacities,
   ...rest
 }: PropsWithChildren<ButtonProps>) {
   const orientation = useDeviceOrientation();
   const fontSizes = useFontSizes();
+  const isGradient = typeof backgroundColor === 'object';
   const sizes = buttonSizes[buttonSize || 'medium'];
-  const configuredStyles: ViewStyle = {
-    ...transformSpacing({ padding, orientation }),
+  const radius =
+    typeof borderRadius === 'number'
+      ? borderRadius
+      : borderRadius
+        ? radiusSizes[borderRadius]
+        : radiusSizes[sizes.borderRadius];
+  const borderConfig = {
     borderWidth: borderSizes[borderWidth || 'thin'],
     borderColor: borderColor || 'transparent',
-    paddingHorizontal: sizes.paddingHorizontal,
-    paddingVertical: sizes.paddingVertical,
-    borderRadius: borderRadius
-      ? radiusSizes[borderRadius]
-      : radiusSizes[sizes.borderRadius],
+    borderRadius: radius,
+  };
+
+  const configuredStyles: ViewStyle = {
+    borderRadius: radius - 1,
+    overflow: 'hidden',
     width: sizes.width,
     alignSelf,
-    backgroundColor,
+    backgroundColor: isGradient ? undefined : backgroundColor,
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
   };
   const contentStyle: ViewStyle = {
+    ...transformSpacing({ padding, orientation }),
+    paddingHorizontal: sizes.paddingHorizontal,
+    paddingVertical: sizes.paddingVertical,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
@@ -79,36 +93,51 @@ export function BaseButton({
       activeOpacity={disabled ? 0.5 : activeOpacity || 0.8}
       style={{
         ...transformSpacing({ margin, orientation }),
+        ...borderConfig,
+        overflow: 'hidden',
         width: configuredStyles.width,
         alignSelf: configuredStyles.alignSelf || 'center',
       }}
       onPress={onPress}
       disabled={disabled || !!loading}
     >
-      <ViewComponent style={[configuredStyles, style]}>
-        <View style={contentStyle}>
-          {leftComponent}
-          <BaseText
-            {...rest}
-            style={{
-              marginRight: rightComponentGap,
-              marginLeft: leftComponentGap,
-            }}
-            customColor={customFontColor}
-            fontSize={fSize}
-            fontStyle={fontStyle || 'Medium'}
-            animatedStyle={[{ lineHeight: fontSizes[fSize] * 1.3 }, textStyle]}
-          >
-            {children || 'Submit'}
-          </BaseText>
-          {rightComponent}
-        </View>
-        {loading ? (
-          <View style={loadingContainerStyle}>
-            <ActivityIndicator size="small" color={customFontColor} />
+      <>
+        <ViewComponent style={[configuredStyles, style]}>
+          {isGradient ? (
+            <AbsoluteLinearGradient
+              colors={backgroundColor}
+              end={gradientEnd}
+              start={gradientStart}
+              opacities={gradientOpacities}
+            />
+          ) : undefined}
+          <View style={contentStyle}>
+            {leftComponent}
+            <BaseText
+              {...rest}
+              style={{
+                marginRight: rightComponentGap,
+                marginLeft: leftComponentGap,
+              }}
+              customColor={customFontColor}
+              fontSize={fSize}
+              fontStyle={fontStyle || 'Medium'}
+              animatedStyle={[
+                { lineHeight: fontSizes[fSize] * 1.3 },
+                textStyle,
+              ]}
+            >
+              {children || 'Submit'}
+            </BaseText>
+            {rightComponent}
           </View>
-        ) : null}
-      </ViewComponent>
+          {loading ? (
+            <View style={loadingContainerStyle}>
+              <ActivityIndicator size="small" color={customFontColor} />
+            </View>
+          ) : null}
+        </ViewComponent>
+      </>
     </Press>
   );
 }

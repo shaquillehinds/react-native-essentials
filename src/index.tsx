@@ -6,4 +6,5 @@ export * from './essentials/styles';
 export * from './essentials/utils';
 export * from './essentials/gestures';
 export * from './essentials/animations';
+export * from './essentials/svgs';
 import './essentials/utils/global';
