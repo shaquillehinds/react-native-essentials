@@ -5,6 +5,7 @@ import type {
   ViewStyle,
 } from 'react-native';
 import { type AnimatedStyle } from 'react-native-reanimated';
+import type { ShadowStylesProps } from '../../styles';
 import type { LoadingIndicatorProps } from '../indicators';
 import type { BaseTextProps } from '../typography';
 
@@ -32,6 +33,7 @@ export interface ButtonProps extends Omit<BaseTextProps, 'style'> {
   textStyle?: StyleProp<AnimatedStyle<StyleProp<TextStyle>>>;
   alignSelf?: FlexAlignType;
   style?: StyleProp<AnimatedStyle<StyleProp<ViewStyle>>>;
+  shadow?: ShadowStylesProps;
   rightComponent?: JSX.Element;
   leftComponent?: JSX.Element;
   rightComponentGap?: number;

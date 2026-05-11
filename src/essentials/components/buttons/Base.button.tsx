@@ -2,7 +2,8 @@ import type { PropsWithChildren } from 'react';
 import { ActivityIndicator, View, type ViewStyle } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useDeviceOrientation, useFontSizes } from '../../hooks';
-import { transformSpacing } from '../../styles';
+import { shadowStyles, transformSpacing } from '../../styles';
+import { AbsoluteLinearGradient } from '../../svgs';
 import {
   borderSizes,
   buttonSizes,
@@ -11,7 +12,6 @@ import {
 import { BaseText } from '../typography';
 import { Press } from '../wrappers';
 import type { ButtonProps } from './Button.types';
-import { AbsoluteLinearGradient } from '../../svgs';
 
 export function BaseButton({
   buttonSize,
@@ -41,6 +41,7 @@ export function BaseButton({
   gradientEnd,
   gradientStart,
   gradientOpacities,
+  shadow,
   ...rest
 }: PropsWithChildren<ButtonProps>) {
   const orientation = useDeviceOrientation();
@@ -93,8 +94,8 @@ export function BaseButton({
       activeOpacity={disabled ? 0.5 : activeOpacity || 0.8}
       style={{
         ...transformSpacing({ margin, orientation }),
+        ...(shadow ? shadowStyles(shadow) : {}),
         ...borderConfig,
-        overflow: 'hidden',
         width: configuredStyles.width,
         alignSelf: configuredStyles.alignSelf || 'center',
       }}
