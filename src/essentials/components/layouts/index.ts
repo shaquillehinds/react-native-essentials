@@ -3,3 +3,4 @@ export { RowLayout } from './Row.layout';
 export { ScreenLayout, type ScreenLayoutProps } from './Screen.layout';
 export { AnimatedLayout, type AnimatedLayoutProps } from './Animated.layout';
 export { TouchableLayout, type TouchableLayoutProps } from './Touchable.layout';
+export * from './Separator.layout';
