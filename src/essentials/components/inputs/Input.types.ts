@@ -3,9 +3,11 @@ import type { LayoutProps } from '../layouts';
 import type { StateInputProps, StateInputRef } from './StateText.input';
 
 export type BaseInputProps = {
+  hasError?: boolean;
   backgroundColor: string;
   focusedBorderColor?: string;
   blurredBorderColor?: string;
+  erroredBorderColor?: string;
   textInputProps: TextInputProps;
   LeftComponent?: React.ReactNode;
   RightComponent?: React.ReactNode;

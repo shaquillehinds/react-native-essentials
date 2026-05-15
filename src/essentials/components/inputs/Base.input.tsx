@@ -8,7 +8,7 @@ import {
 import { RowLayout } from '../layouts';
 import type { BaseInputProps } from './Input.types';
 import { isAndroid } from '../../constants/device.const';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StateTextInput } from './StateText.input';
 
 export function BaseInput({
@@ -20,12 +20,15 @@ export function BaseInput({
   refTextInput,
   focusedBorderColor,
   blurredBorderColor,
+  erroredBorderColor,
+  hasError,
   refStateInput,
   refStateInputValidator,
   style,
   ...rest
 }: BaseInputProps) {
   const [isFocused, setIsFocused] = useState(false);
+  const [isErrored, setIsErrored] = useState(false);
   const inputRef = useRef<TextInput>(null);
   let width = 100;
   if (LeftComponent) width -= 10;
@@ -33,14 +36,19 @@ export function BaseInput({
   const layoutStyle: StyleProp<ViewStyle> = {
     width: '100%' as DimensionValue,
     borderWidth: 1,
-    borderColor: isFocused
-      ? focusedBorderColor || '#4A87F2'
-      : blurredBorderColor || 'transparent',
+    borderColor: isErrored
+      ? erroredBorderColor || '#E55774'
+      : isFocused
+        ? focusedBorderColor || '#4A87F2'
+        : blurredBorderColor || 'transparent',
   };
   const inputStyle: StyleProp<TextStyle> = {
     width: `${width}%` as DimensionValue,
   };
   if (refTextInput) refTextInput.current = inputRef.current;
+  useEffect(() => {
+    setIsErrored(!!hasError);
+  }, [hasError]);
   return (
     <RowLayout
       center
