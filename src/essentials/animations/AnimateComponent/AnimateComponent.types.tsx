@@ -78,4 +78,5 @@ export type AnimateComponentProps<
   autoStart?: boolean;
   returnToStart?: boolean;
   loop?: number;
+  onAnimationEnd?: Animated.EndCallback;
 }>;

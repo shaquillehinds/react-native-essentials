@@ -39,7 +39,7 @@ export function AnimateValueComponent(
       if (props.loop)
         composition = Animated.loop(composition, { iterations: props.loop });
       compositionRef.current = composition;
-      if (props.autoStart) composition.start();
+      if (props.autoStart) composition.start(props.onAnimationEnd);
     } else {
       const length = props.toPosition.length;
       if (props.toPosition.length) {
@@ -71,14 +71,14 @@ export function AnimateValueComponent(
             });
         }
         compositionRef.current = composition;
-        if (props.autoStart) composition.start();
+        if (props.autoStart) composition.start(props.onAnimationEnd);
       }
     }
   }, [props]);
 
   useImperativeHandle(props.ref, () => ({
     stop: () => compositionRef.current?.stop(),
-    start: () => compositionRef.current?.start(),
+    start: () => compositionRef.current?.start(props.onAnimationEnd),
     reset: () => compositionRef.current?.reset(),
     reverse: () => {
       compositionRef.current?.stop();
@@ -88,7 +88,7 @@ export function AnimateValueComponent(
           animationSwitcher(animatedValue, {
             ...config,
             toValue: props.initialPosition,
-          }).start();
+          }).start(props.onAnimationEnd);
       } else {
         const length = props.toPosition.length;
         if (props.toPosition.length) {
@@ -98,7 +98,7 @@ export function AnimateValueComponent(
               animationSwitcher(animatedValue, {
                 ...firstConfig,
                 toValue: props.initialPosition,
-              }).start();
+              }).start(props.onAnimationEnd);
           } else {
             Animated.sequence([
               ...props.toPosition.filterMap((config) => {
