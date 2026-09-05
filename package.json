@@ -20,12 +20,17 @@
       }
     }
   },
+  "bin": {
+    "rne-rules": "./bin/install-rules.js"
+  },
   "files": [
     "lib",
     "src",
     "android",
     "ios",
     "cpp",
+    "rules",
+    "bin",
     "*.podspec",
     "react-native.config.js",
     "!ios/build",
