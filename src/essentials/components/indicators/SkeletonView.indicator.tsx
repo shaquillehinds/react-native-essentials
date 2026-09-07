@@ -57,7 +57,7 @@ export function SkeletonViewIndicator({
 
   return (
     <View {...props} style={[baseStyle, style]}>
-      <Svg height="100%" width="100%" style={StyleSheet.absoluteFillObject}>
+      <Svg height="100%" width="100%" style={StyleSheet.absoluteFill}>
         <Defs>
           <AnimatedLinearGradient
             id="grad"

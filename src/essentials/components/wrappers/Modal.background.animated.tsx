@@ -21,7 +21,8 @@ export function ModalBackgroundAnimated(
     <TouchableWithoutFeedback onPress={props.onPress}>
       <Animated.View
         style={[
-          { ...StyleSheet.absoluteFillObject, zIndex: maxZIndex },
+          StyleSheet.absoluteFill,
+          { zIndex: maxZIndex },
           props.style,
           props.animatedStyle,
         ]}
