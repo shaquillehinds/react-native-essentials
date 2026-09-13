@@ -158,7 +158,9 @@ export function TouchableLayout({
           componentStyle as StyleProp<ViewStyle>,
         ]}
         colors={typeof skeleton !== 'boolean' ? skeleton.colors : undefined}
-      />
+      >
+        {children}
+      </SkeletonViewIndicator>
     );
 
   return (

@@ -26,6 +26,7 @@ export function SkeletonViewIndicator({
   style,
   colors,
   disableAnimation,
+  children,
   ...props
 }: SkeletonLoadingIndicatorProps) {
   const offset = useSharedValue(0);
@@ -47,17 +48,15 @@ export function SkeletonViewIndicator({
     };
   });
 
-  const baseStyle: StyleProp<ViewStyle> = {
-    justifyContent: 'center',
-    alignItems: 'center',
-  };
+  const baseStyle: StyleProp<ViewStyle> = { overflow: 'hidden' };
 
   const colorA = colors?.[0] || '#ECECEC';
   const colorB = colors?.[1] || '#FBFAFE';
 
   return (
     <View {...props} style={[baseStyle, style]}>
-      <Svg height="100%" width="100%" style={StyleSheet.absoluteFill}>
+      <View style={{ opacity: 0 }}>{children}</View>
+      <Svg style={StyleSheet.absoluteFill}>
         <Defs>
           <AnimatedLinearGradient
             id="grad"

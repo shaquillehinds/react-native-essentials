@@ -332,7 +332,7 @@ import { Layout } from '@shaquillehinds/react-native-essentials';
 | `borderWidth`                                         | `BorderSize`                                                       | Token, not a number.                                                                                                         |
 | `borderRadius`                                        | `RadiusSize`                                                       | Token, not a number.                                                                                                         |
 | `loading`                                             | `boolean \| LoadingIndicatorProps`                                 | **Replaces the whole layout** with a `LoadingIndicator`. Only `backgroundColor` and the object's props are used.             |
-| `skeleton`                                            | `boolean \| { colors?: [string, string] }`                         | Renders a `SkeletonViewIndicator` with the layout's computed styles (same size, spacing, radius).                            |
+| `skeleton`                                            | `boolean \| { colors?: [string, string] }`                         | Wraps `children` in a `SkeletonViewIndicator` with the layout's computed styles. Children are rendered invisibly to size the shimmer, so pass **mock data** while loading (see [Skeleton loading](#skeleton-loading)). |
 | `scrollable`                                          | `boolean`                                                          | Renders a `ScrollView`. When `true`, the remaining props are typed as `ScrollViewProps`; otherwise `ViewProps`.              |
 | `animated`                                            | `boolean`                                                          | Use an animated wrapper.                                                                                                     |
 | `animatedType`                                        | `'reanimated' \| 'react-native'`                                   | Default `'reanimated'`.                                                                                                      |
@@ -340,6 +340,42 @@ import { Layout } from '@shaquillehinds/react-native-essentials';
 | `style`                                               | `StyleProp<ViewStyle>`                                             | Applied last. Ignored when using Reanimated animation (use `animatedStyle`).                                                 |
 
 Everything else is forwarded to the underlying `View` / `ScrollView` (`onLayout`, `onTouchStart`, `pointerEvents`, `collapsable`, `contentContainerStyle`, ...).
+
+#### Skeleton loading
+
+A skeleton must have the **exact dimensions and shape of the data it stands in for**. `Layout` does not try to guess that shape: when `skeleton` is on it renders the layout's normal styles and its `children` at `opacity: 0`, then paints the shimmer over the area those children occupy. The skeleton therefore only ever knows about layout, never about data.
+
+The pattern is:
+
+1. While loading, render the **same component tree** you would render with real data, but feed it **mock data** with realistic lengths (a plausible name, a two‑line description, a real‑looking price).
+2. Pass `skeleton={isLoading}` to the `Layout` / `RowLayout` / `TouchableLayout` that wraps that tree.
+3. When the data arrives, swap the mock data for the real data and set `skeleton` to `false`. Nothing else changes, so there is no layout shift.
+
+```tsx
+const MOCK_USER = { name: 'Firstname Lastname', bio: 'A short two‑line bio that is about this long so the card keeps its height.' };
+
+function UserCard({ user, loading }: { user?: User; loading: boolean }) {
+  const data = loading ? MOCK_USER : user!;
+  return (
+    <RowLayout skeleton={loading} padding={[2, 4]} borderRadius="soft" backgroundColor="#fff">
+      <Avatar uri={data.avatarUrl} />
+      <Layout flex={[1]}>
+        <Heading>{data.name}</Heading>
+        <Body>{data.bio}</Body>
+      </Layout>
+    </RowLayout>
+  );
+}
+```
+
+Rules of thumb:
+
+- Never render an empty `<Layout skeleton />`. With no children (and no explicit `width`/`height`) it has nothing to measure and collapses.
+- Mock data should fill the component the way real data would, including text length and list item count. Too little mock data gives a skeleton that is smaller than the loaded content.
+- Put `skeleton` on the smallest layout that wraps one unit of loading content (a card, a row, a list item) rather than on the whole screen, so static chrome such as headers stays visible.
+- For a single loading text node inside loaded chrome, use the text component's own `skeleton` prop instead (see [Typography](#typography)).
+- `children` must not do anything with side effects (fetching, analytics) when rendered with mock data; they are still mounted, only hidden.
+- Use `loading` instead only when a spinner is genuinely wanted and the placeholder size does not matter.
 
 #### The centring rule
 
@@ -449,6 +485,7 @@ Renders `RowLayout` → line, children, line.
 | `animatedStyle`     | `StyleProp<AnimatedStyle<TextStyle>>` | Applied between the computed style and `style`.                                               |
 | `translate`         | `boolean`                             | Wraps string children in `TranslateText` (see [LocalizationProvider](#localizationprovider)). |
 | `padding`, `margin` | `Spaces`                              | Percent tuples (static `relativeX`/`relativeY`).                                              |
+| `skeleton`          | `SkeletonLoadingIndicatorProps`       | Object, not boolean. Wraps the text in a `SkeletonViewIndicator` sized by the (hidden) text, so pass mock text of realistic length. `margin` moves to the wrapper; `colors`, `disableAnimation`, `style` inside the object go to the wrapper. |
 | `style`             | `StyleProp<TextStyle>`                | Applied last.                                                                                 |
 
 ```tsx
@@ -459,6 +496,17 @@ Renders `RowLayout` → line, children, line.
 </Body>
 <Body translate center fontSize="bodyL">{description}</Body>
 ```
+
+Text skeletons follow the same rule as [Layout skeletons](#skeleton-loading): the text is rendered at `opacity: 0` with its real font size, line height and padding, and the shimmer covers exactly that box. Enable it with an object (an empty one is fine) and render mock text of the length you expect:
+
+```tsx
+<Heading skeleton={loading ? {} : undefined}>{loading ? 'Placeholder headline' : post.title}</Heading>
+<Body numberOfLines={2} skeleton={loading ? { colors: ['#222', '#333'] } : undefined}>
+  {loading ? 'Two lines of placeholder body copy that is roughly as long as a real excerpt would be.' : post.excerpt}
+</Body>
+```
+
+Use a text skeleton for a single text node inside otherwise‑loaded chrome (a price, a username). When a whole card is loading, put `skeleton` on the wrapping `Layout` instead so all children shimmer as one block. Because `ButtonProps` extends `BaseTextProps`, `skeleton` on a `BaseButton` is forwarded to its label only; the button frame stays visible.
 
 Recommended pattern: wrap `BaseText` once per role in your project so colours come from your theme, then use those wrappers everywhere.
 
@@ -685,7 +733,17 @@ Used by `Layout loading`. Example of a full‑screen overlay:
 
 ### SkeletonViewIndicator
 
-Shimmering gradient block (Reanimated + `react-native-svg`). Props: `colors?: [string, string]` (default `['#ECECEC', '#FBFAFE']`), `disableAnimation?`, plus `ViewProps`. Used by `Layout skeleton`.
+Shimmering gradient overlay (Reanimated + `react-native-svg`). Props: `colors?: [string, string]` (default `['#ECECEC', '#FBFAFE']`), `disableAnimation?`, `children`, plus `ViewProps`. Used by `Layout` / `TouchableLayout` `skeleton`.
+
+It sizes itself from its `children`: they are rendered at `opacity: 0` (still mounted, still measured) and an absolutely‑filled gradient is drawn on top with `overflow: 'hidden'`. It has no intrinsic size of its own, so always give it either children populated with mock data or an explicit `width`/`height` via `style`.
+
+```tsx
+<SkeletonViewIndicator style={{ borderRadius: radiusSizes.soft }}>
+  <Body>{loading ? 'Placeholder text of the same length' : text}</Body>
+</SkeletonViewIndicator>
+```
+
+Prefer `Layout skeleton` over using this directly; it gives you the layout's spacing, radius and sizing for free.
 
 ### ViewDimensionsInjector
 
@@ -1226,7 +1284,7 @@ All extend `EventEmitter` (`'timeout'` / `'interval'` events).
 ## Known caveats
 
 - `centerX` means `justifyContent: 'center'` (main axis), `center` means `alignItems: 'center'` (cross axis). In a column layout `centerX` therefore centres vertically.
-- `Layout loading` discards the layout's own dimensions; use `skeleton` when you need a placeholder of the same size.
+- `Layout loading` discards the layout's own dimensions; use `skeleton` when you need a placeholder of the same size. `skeleton` sizes itself from the (hidden) `children`, so an empty `<Layout skeleton />` without explicit `width`/`height` renders nothing visible; pass mock data as children.
 - With `animated` + `animatedType="reanimated"` (including `AnimatedLayout` and `PressableLayout`) the `style` prop is not applied; pass `animatedStyle`.
 - `Layout` / `TouchableLayout` accept only `BorderSize` / `RadiusSize` tokens for `borderWidth` / `borderRadius`; `BaseButton` additionally accepts a numeric `borderRadius`.
 - `relativeShortWorklet` and `relativeLongWorklet` from the static utils do not return a value. Use `useDeviceOrientation().relativeShortWorklet` / `relativeLongWorklet` inside worklets.

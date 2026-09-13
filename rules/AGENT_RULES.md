@@ -107,7 +107,7 @@ Vertical values (top/bottom) are `relativeY` (% of screen **height**). Horizonta
   padding={[1, 3]} margin={[2, 0]}
   // states
   loading                  // or loading={{ ...LoadingIndicatorProps }}
-  skeleton                 // or skeleton={{ colors: ['#eee', '#fff'] }}
+  skeleton                 // or skeleton={{ colors: ['#eee', '#fff'] }} — children must be mock data (see below)
   // behaviour
   scrollable               // renders ScrollView; ScrollViewProps become valid
   animated animatedType="reanimated" animatedStyle={rStyle}
@@ -126,7 +126,33 @@ Therefore:
 - In a **`RowLayout`**: `center` = vertical centring, `centerX` = horizontal centring.
 - To centre both ways: `center centerX`.
 
-**`loading` replaces the entire layout** with a `LoadingIndicator` (only `backgroundColor` and the `loading` object props are used). `skeleton` renders a shimmering `SkeletonViewIndicator` **with the same dimensions/spacing** as the layout would have had.
+**`loading` replaces the entire layout** with a `LoadingIndicator` (only `backgroundColor` and the `loading` object props are used).
+
+**`skeleton` overlays the layout's children.** The layout keeps its normal styles, renders `children` at `opacity: 0`, and draws a shimmering `SkeletonViewIndicator` over exactly the area those children occupy. The skeleton knows nothing about the data; it only mirrors the layout. Consequently:
+
+- **Always render the real component tree with mock data while loading.** `const data = loading ? MOCK : real;` then render the same JSX and pass `skeleton={loading}`. When data arrives, swap the data and flip `skeleton` off. No separate "skeleton component" is written.
+- **Mock data must fill the component the way real data would**: realistic text lengths, realistic list lengths, every slot populated. Under‑filled mock data produces an under‑sized skeleton and a layout jump on load.
+- **Never render `<Layout skeleton />` with no children** unless you also set explicit `width`/`height`; it has no intrinsic size and collapses.
+- Apply `skeleton` to the smallest layout wrapping one unit of loading content (card, row, list item), not to the whole screen, so headers and static chrome stay visible.
+- Children are still mounted while hidden, so they must be side‑effect free for mock data (no fetches keyed off mock ids, no analytics).
+- Same rules apply to `TouchableLayout skeleton`. Text components have their own object‑valued `skeleton` prop for single text nodes (§5).
+
+```tsx
+const MOCK_PRODUCT = { title: 'Product title placeholder', price: '$00.00', tags: ['tag', 'tag', 'tag'] };
+
+function ProductRow({ product, loading }: { product?: Product; loading: boolean }) {
+  const data = loading ? MOCK_PRODUCT : product!;
+  return (
+    <RowLayout skeleton={loading} center padding={[1.5, 4]} borderRadius="soft">
+      <Layout flex={[1]}>
+        <Heading>{data.title}</Heading>
+        <Body>{data.tags.join(' · ')}</Body>
+      </Layout>
+      <Body>{data.price}</Body>
+    </RowLayout>
+  );
+}
+```
 
 **`scrollable`**: `padding`/alignment props go to `contentContainerStyle`; `margin`/size/position props go to the outer `style`; `overflow` is forced to `'visible'`. Any `contentContainerStyle` you pass is merged after the package's.
 
@@ -190,7 +216,15 @@ A horizontal rule with optional centred children (e.g. "OR"). Props: `lineColor`
 
 `FontStyle` union: `'Thin' | 'Extra Light' | 'Light' | 'Regular' | 'Medium' | 'SemiBold' | 'Bold' | 'ExtraBold' | 'Black'`. **`fontStyle` is written straight to `fontFamily`.**
 
-Shared text props (`BaseTextProps` extends `TextProps` + `Spacing`): `customColor`, `center` (textAlign), `lineHeight: 'short' | 'tall'` (×1.05 / ×1.35), `letterSpacing: 'wide' | 'extraWide'` (0.7 / 1.2), `numberOfLines`, `onPress`, `animate` (Reanimated `Animated.Text`) + `animatedStyle`, `translate` (see §8), `padding`, `margin`, `style`.
+Shared text props (`BaseTextProps` extends `TextProps` + `Spacing`): `customColor`, `center` (textAlign), `lineHeight: 'short' | 'tall'` (×1.05 / ×1.35), `letterSpacing: 'wide' | 'extraWide'` (0.7 / 1.2), `numberOfLines`, `onPress`, `animate` (Reanimated `Animated.Text`) + `animatedStyle`, `translate` (see §8), `padding`, `margin`, `skeleton`, `style`.
+
+**`skeleton` on text is an object, not a boolean** (`SkeletonLoadingIndicatorProps`: `colors?`, `disableAnimation?`, `style?`, plus `ViewProps`). `skeleton={loading ? {} : undefined}` enables it. The text is rendered at `opacity: 0` with its real font size / line height / padding and a shimmer covers exactly that box; `margin` moves to the shimmer wrapper. The same mock‑data rule as §4 applies: render placeholder text of the length you expect the real text to be, then swap in the real string when it arrives.
+
+```tsx
+<Body skeleton={loading ? {} : undefined}>{loading ? '$00.00' : formatPrice(item.price)}</Body>
+```
+
+Use the text `skeleton` for one loading text node inside otherwise‑loaded chrome. When the whole card is loading, put `skeleton` on the wrapping `Layout` (§4) instead so everything shimmers as one block. `BaseButton` forwards `skeleton` to its label only; the button frame stays visible.
 
 **Project pattern (from the example app):** create thin wrappers `components/typography/{Body,Title,Heading}.tsx` that call `BaseText` with `customColor={theme.typeface.primary}` and the defaults above, then use those wrappers everywhere. Do the same for buttons (`PrimaryButton`, `SecondaryButton` around `BaseButton`).
 
@@ -395,6 +429,19 @@ style={{ width: 300, height: 48, borderRadius: 12, paddingHorizontal: 16 }}
 width={80} height={6} borderRadius="medium" padding={[0, 4]}
 // or in StyleSheet.create:
 { width: relativeX(80), height: relativeY(6), borderRadius: radiusSizes.medium, paddingHorizontal: relativeX(4) }
+```
+
+```tsx
+// ❌ empty skeleton / separate skeleton tree — has no size, or drifts from the real layout
+{loading ? <Layout skeleton height={10} /> : <UserCard user={user} />}
+{loading ? <UserCardSkeleton /> : <UserCard user={user} />}
+
+// ✅ same tree, mock data while loading, skeleton on the wrapping layout
+const data = loading ? MOCK_USER : user;
+<RowLayout skeleton={loading} center padding={[2, 4]} borderRadius="soft">
+  <Heading>{data.name}</Heading>
+  <Body>{data.bio}</Body>
+</RowLayout>
 ```
 
 ```tsx

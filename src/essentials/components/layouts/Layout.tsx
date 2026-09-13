@@ -182,7 +182,9 @@ export function Layout<Scrollable extends boolean | undefined = undefined>({
           componentStyle as StyleProp<ViewStyle>,
         ]}
         colors={typeof skeleton !== 'boolean' ? skeleton.colors : undefined}
-      />
+      >
+        {children}
+      </SkeletonViewIndicator>
     );
   if (scrollable) {
     viewStyle.overflow = 'visible';

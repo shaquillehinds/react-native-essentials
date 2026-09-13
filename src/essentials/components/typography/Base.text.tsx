@@ -5,6 +5,7 @@ import type { PropsWithChildren } from 'react';
 import Animated from 'react-native-reanimated';
 import { TranslateText } from './Translate.text';
 import { useFontSizes } from '../../hooks/useFontSizes';
+import { SkeletonViewIndicator } from '../indicators';
 
 const spacings: { [key in LetterSpacing]: number } = {
   wide: 0.7,
@@ -31,6 +32,7 @@ export function BaseText({
   center,
   onPress,
   translate,
+  skeleton,
   ...rest
 }: PropsWithChildren<BaseTextProps>) {
   const fontSizes = useFontSizes();
@@ -47,8 +49,24 @@ export function BaseText({
       lineHeight && fontSize
         ? heights[lineHeight] * fontSizes[fontSize]
         : undefined,
-    ...transformSpacing({ margin, padding }),
+    ...transformSpacing(skeleton ? { padding } : { margin, padding }),
   };
+  if (skeleton)
+    return (
+      <SkeletonViewIndicator
+        {...skeleton}
+        style={[{ ...transformSpacing({ margin }) }, skeleton.style]}
+      >
+        <TextComponent
+          onPress={onPress}
+          numberOfLines={numberOfLines}
+          style={[styles, animatedStyle, style]}
+          {...rest}
+        >
+          {children}
+        </TextComponent>
+      </SkeletonViewIndicator>
+    );
   return (
     <TextComponent
       onPress={onPress}

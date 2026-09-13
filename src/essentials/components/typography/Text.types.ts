@@ -8,8 +8,10 @@ import { type AnimatedStyle } from 'react-native-reanimated';
 import type { Spacing } from '../../styles';
 import type { ReactNode } from 'react';
 import type { LocalizationContextValue } from '../providers';
+import type { SkeletonLoadingIndicatorProps } from '../indicators';
 
 export interface BaseTextProps extends Spacing, TextProps {
+  skeleton?: SkeletonLoadingIndicatorProps;
   translate?: boolean;
   fontSize?: FontSize;
   customColor?: string;
