@@ -364,7 +364,7 @@ const { observables } = isolateRef.current!.useObservation({
 
 `useObservation(subscribeTo?)` re‑renders the consumer only when a subscribed key changed (and, if a predicate is given, when the predicate returns true). `isolateRef.current.get(key)` reads without subscribing. Use this instead of prop‑drilling or context for hot values.
 
-Related: `ComponentMounter` (mount/unmount with delays via `showComponent`/`setShowComponent` or a `ComponentMounterController` ref: `mountComponent`, `unMountComponent({duration?, onClose?})`, `hardUnMountComponent`), and the modal trio `ModalWrapper` (`useNativeModal`, `enableBackgroundContentPress`, `disableAndroidBackButton`, `onRequestClose`), `ModalBackgroundAnimated` (`onPress`, `animatedStyle`, `avoidStatusBar`), `ModalForegroundWrapper`.
+Related: `ComponentMounter` (mount/unmount with delays via `showComponent`/`setShowComponent` or a `ComponentMounterController` ref: `mountComponent`, `unMountComponent({duration?, onClose?})`, `hardUnMountComponent`; pass `keepMountedOnReopen` so a reopen inside the unmount delay stays mounted instead of hard‑unmounting; `onComponentShow`/`onComponentClose` and the delay props are read from the latest props, so inline callbacks are fine), and the modal trio `ModalWrapper` (`useNativeModal`, `enableBackgroundContentPress`, `disableAndroidBackButton`, `onRequestClose`), `ModalBackgroundAnimated` (`onPress`, `animatedStyle`, `avoidStatusBar`), `ModalForegroundWrapper`.
 
 ---
 

@@ -94,6 +94,12 @@ export function Press({
       {...props}
       style={[style, disableAnimation ? {} : animatedStyle]}
       onTouchStart={(e) => {
+        // A new gesture starts clean. Without this, a flick that ended inside a
+        // descendant calling stopPropagation() leaves moveCancelledRef set and
+        // the next tap is dropped. Guarded so a second finger joining an active
+        // drag does not clear the cancellation.
+        if ((e.nativeEvent.touches?.length ?? 1) <= 1)
+          moveCancelledRef.current = false;
         stopPropagation && e.stopPropagation();
         preventDefault && e.preventDefault();
         persist && e.persist();
