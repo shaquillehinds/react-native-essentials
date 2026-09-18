@@ -765,7 +765,7 @@ mounter.current?.unMountComponent({ duration: 300, onClose });
 mounter.current?.hardUnMountComponent();
 ```
 
-Props: `component` (required), `showComponent?`, `setShowComponent?`, `onComponentShow?`, `onComponentClose?`, `mountDelayInMilliSeconds?`, `unMountDelayInMilliSeconds?`, `mountDefault?`. When `showComponent` is toggled from `true` while already mounted, the mounter flips `setShowComponent(false)` and hard‑unmounts on the next change.
+Props: `component` (required), `showComponent?`, `setShowComponent?`, `onComponentShow?`, `onComponentClose?`, `mountDelayInMilliSeconds?`, `unMountDelayInMilliSeconds?`, `mountDefault?`, `keepMountedOnReopen?` (default `false`). When `showComponent` turns `true` while already mounted (for example a reopen inside the unmount delay), the default behaviour is to flip `setShowComponent(false)` and hard‑unmount on the next change; pass `keepMountedOnReopen` to cancel the pending unmount and stay mounted instead. Callbacks and delays are read from the latest props on every mount/unmount, so they do not need to be memoised.
 
 ### RadioIcon
 

@@ -137,13 +137,18 @@ export const usePortalComponent = (props: UsePortalComponentProps) => {
   const portalId = useRef('');
   const portal = usePortal(props.CustomPortalContext);
   useEffect(() => {
-    if (!props.disable) {
+    if (props.disable) {
       if (portalId.current) {
-        portal?.update(portalId.current, props.Component);
-      } else {
-        portalId.current = getSequantialRandomId(props.name);
-        portal?.mount(portalId.current, props.Component);
+        portal?.unmount(portalId.current);
+        portalId.current = '';
       }
+      return;
+    }
+    if (portalId.current) {
+      portal?.update(portalId.current, props.Component);
+    } else {
+      portalId.current = getSequantialRandomId(props.name);
+      portal?.mount(portalId.current, props.Component);
     }
   }, [props.Component, props.disable]);
   useEffect(() => {

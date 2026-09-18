@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+//$lf-ignore
 /**
  * Copies the package's AI agent rules into the consuming project.
  *
@@ -31,18 +32,8 @@ const body =
 
 fs.mkdirSync(path.dirname(dest), { recursive: true });
 if (fs.existsSync(dest) && !process.argv.includes('--force')) {
-  console.error(
-    $lf(31),
-    `${dest} already exists. Re-run with --force to overwrite.`
-  );
+  console.error(`${dest} already exists. Re-run with --force to overwrite.`);
   process.exit(1);
 }
 fs.writeFileSync(dest, body);
-console.log(
-  $lf(35),
-  `Wrote agent rules to ${path.relative(process.cwd(), dest)}`
-);
-function $lf(n) {
-  return '$lf|bin/install-rules.js:' + n + ' >';
-  // Automatically injected by Log Location Injector vscode extension
-}
+console.log(`Wrote agent rules to ${path.relative(process.cwd(), dest)}`);
