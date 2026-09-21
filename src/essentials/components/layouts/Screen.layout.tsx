@@ -1,12 +1,16 @@
 import { type PropsWithChildren } from 'react';
 import { type ColorValue, type ViewStyle } from 'react-native';
 import { Layout, type LayoutProps } from './Layout';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import {
+  SafeAreaProvider,
+  SafeAreaView,
+  type Edges,
+} from 'react-native-safe-area-context';
 
 export type ScreenLayoutProps<
   Scrollable extends boolean | undefined = undefined,
 > = {
-  safe?: boolean;
+  safe?: boolean | Edges;
 } & LayoutProps<Scrollable>;
 
 export function ScreenLayout<
@@ -31,9 +35,12 @@ export function ScreenLayout<
       overflow: 'visible',
       backgroundColor,
     };
+    const edges = (
+      typeof props.safe === 'boolean' ? ['top', 'bottom'] : props.safe
+    ) as Edges;
     return (
       <SafeAreaProvider>
-        <SafeAreaView style={safeStyle} edges={['top', 'bottom']}>
+        <SafeAreaView style={safeStyle} edges={edges}>
           <Layout
             {...props}
             style={[style, props.style]}
